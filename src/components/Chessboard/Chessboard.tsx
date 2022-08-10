@@ -24,7 +24,6 @@ export default function Chessboard() {
   const chessboardRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const referee = new Referee();
-  console.log(moveHistory);
   function grabPiece(e: React.MouseEvent) {
     const element = e.target as HTMLElement;
     const chessboard = chessboardRef.current;
