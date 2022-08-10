@@ -22,9 +22,10 @@ export const tileIsOccupied = (
 export const tileIsOccupiedByOpponent = (
   position: Position,
   boardState: Piece[],
-  team: TeamType
+  team: TeamType,
+  type?: PieceType
 ): boolean => {
-  const piece = findEnemyPiece(boardState, position, team);
+  const piece = findEnemyPiece(boardState, position, team, type);
 
   if (piece) {
     return true;
@@ -91,40 +92,73 @@ export const findOURPiece = (
   }
 };
 
+export const controlledVerticallyByOpponent = (
+  position: Position,
+  boardState: Piece[],
+  team: TeamType
+): boolean => {
+  for (let checkingYUp = position.y + 1; checkingYUp < 8; checkingYUp++) {
+    console.log(`checking X: ${position.x} and Y: ${checkingYUp}`);
+    let checkingPosition = { x: position.x, y: checkingYUp };
+    if (tileIsOccupiedByUs(checkingPosition, boardState, team)) {
+      return false;
+    }
+    if (
+      tileIsOccupiedByOpponent(
+        checkingPosition,
+        boardState,
+        team,
+        PieceType.QUEEN
+      ) ||
+      tileIsOccupiedByOpponent(
+        checkingPosition,
+        boardState,
+        team,
+        PieceType.ROOK
+      )
+    ) {
+      return true;
+    }
+  }
+
+  for (
+    let checkingYDown = position.y - 1;
+    checkingYDown > -1;
+    checkingYDown--
+  ) {
+    let checkingPosition = { x: position.x, y: checkingYDown };
+    console.log(`checking X: ${position.x} and Y: ${checkingYDown}`);
+    if (tileIsOccupiedByUs(checkingPosition, boardState, team)) {
+      return false;
+    }
+    if (
+      tileIsOccupiedByOpponent(
+        checkingPosition,
+        boardState,
+        team,
+        PieceType.QUEEN
+      ) ||
+      tileIsOccupiedByOpponent(
+        checkingPosition,
+        boardState,
+        team,
+        PieceType.ROOK
+      )
+    ) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export const tileIsControlledByOpponent = (
   position: Position,
   boardState: Piece[],
   team: TeamType
 ): boolean => {
   //check vertical control
-  for (let checkingY = position.y + 1; checkingY < 8; checkingY++) {
-    console.log(`Checking X: ${position.x} and Y: ${checkingY}`);
-    let checkingPosition = { x: position.x, y: checkingY };
-    if (tileIsOccupiedByUs(checkingPosition, boardState, team)) {
-      console.log(
-        `We have a piece on X: ${checkingPosition.x} Y: ${checkingPosition.y}`
-      );
-      return false;
-    }
-    if (tileIsOccupiedByOpponent(checkingPosition, boardState, team)) {
-      const Pieces_to_Look_For = [PieceType.QUEEN, PieceType.ROOK];
-      for (let i = 0; i < Pieces_to_Look_For.length; i++) {
-        if (
-          findEnemyPiece(
-            boardState,
-            checkingPosition,
-            team,
-            Pieces_to_Look_For[i]
-          )
-        ) {
-          console.log(Pieces_to_Look_For[i]);
-          console.log(
-            `There's a queen on X: ${checkingPosition.x} and Y: ${checkingPosition.y}`
-          );
-          return true;
-        }
-      }
-    }
+  if (controlledVerticallyByOpponent(position, boardState, team)) {
+    return true;
   }
   return false;
 };
