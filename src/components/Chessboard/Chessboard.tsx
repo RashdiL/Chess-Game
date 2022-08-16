@@ -13,6 +13,7 @@ import {
   Position,
   samePosition,
 } from "../../Constants";
+import { tilesControlled } from "../../referee/rules/tilesControlled";
 
 export default function Chessboard() {
   const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
@@ -20,7 +21,7 @@ export default function Chessboard() {
   const [grabPosition, setGrabPosition] = useState<Position>({ x: -1, y: -1 });
   const [pieces, setPieces] = useState<Piece[]>(initialBoardState);
   const [turn, setTurn] = useState<TeamType>(TeamType.WHITE);
-  const [moveHistory, setMoveHistory] = useState<string[]>([]);
+  //const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const chessboardRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const referee = new Referee();
@@ -145,7 +146,13 @@ export default function Chessboard() {
 
               piece.position.x = x;
               piece.position.y = y;
-
+              piece.tilesControlled = tilesControlled(
+                currentPiece.position,
+                currentPiece.type,
+                pieces,
+                piece.team
+              );
+              console.log(currentPiece.tilesControlled);
               let promotionRow = piece.team === TeamType.WHITE ? 7 : 0;
 
               if (y === promotionRow && piece.type === PieceType.PAWN) {
@@ -169,12 +176,12 @@ export default function Chessboard() {
           } else {
             setTurn(TeamType.WHITE);
           }
-
-          let new_move = referee.NewMove(
+          /*(let new_move = referee.NewMove(
             currentPiece.position,
             currentPiece.type
           );
-          setMoveHistory((moveHistory) => [...moveHistory, new_move]);
+          */
+          //setMoveHistory((moveHistory) => [...moveHistory, new_move]);
         } else {
           //RESETS THE PIECE POSITION
           activePiece.style.position = "relative";
