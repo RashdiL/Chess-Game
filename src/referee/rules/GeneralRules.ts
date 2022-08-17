@@ -92,75 +92,29 @@ export const findOURPiece = (
   }
 };
 
-export const controlledVerticallyByOpponent = (
-  position: Position,
-  boardState: Piece[],
-  team: TeamType
-): boolean => {
-  for (let checkingYUp = position.y + 1; checkingYUp < 8; checkingYUp++) {
-    console.log(`checking X: ${position.x} and Y: ${checkingYUp}`);
-    let checkingPosition = { x: position.x, y: checkingYUp };
-    if (tileIsOccupiedByUs(checkingPosition, boardState, team)) {
-      return false;
-    }
-    if (
-      tileIsOccupiedByOpponent(
-        checkingPosition,
-        boardState,
-        team,
-        PieceType.QUEEN
-      ) ||
-      tileIsOccupiedByOpponent(
-        checkingPosition,
-        boardState,
-        team,
-        PieceType.ROOK
-      )
-    ) {
-      return true;
-    }
-  }
-
-  for (
-    let checkingYDown = position.y - 1;
-    checkingYDown > -1;
-    checkingYDown--
-  ) {
-    let checkingPosition = { x: position.x, y: checkingYDown };
-    console.log(`checking X: ${position.x} and Y: ${checkingYDown}`);
-    if (tileIsOccupiedByUs(checkingPosition, boardState, team)) {
-      return false;
-    }
-    if (
-      tileIsOccupiedByOpponent(
-        checkingPosition,
-        boardState,
-        team,
-        PieceType.QUEEN
-      ) ||
-      tileIsOccupiedByOpponent(
-        checkingPosition,
-        boardState,
-        team,
-        PieceType.ROOK
-      )
-    ) {
-      return true;
-    }
-  }
-  return false;
-};
-
 export const tileIsControlledByOpponent = (
   position: Position,
   boardState: Piece[],
   team: TeamType
 ): boolean => {
-  //check vertical control
-  if (controlledVerticallyByOpponent(position, boardState, team)) {
-    return true;
+  let controlled = false;
+  for (let i = 0; i < boardState.length; i++) {
+    if (boardState[i].tilesControlled) {
+      for (let j = 0; j < boardState[i].tilesControlled.length; j++) {
+        if (
+          samePosition(position, boardState[i].tilesControlled[j]) &&
+          boardState[i].team !== team
+        ) {
+          controlled = true;
+          break;
+        }
+      }
+      if (controlled) {
+        break;
+      }
+    }
   }
-  return false;
+  return controlled;
 };
 
 export const tileIsEmptyOrOccupiedByOpponent = (
@@ -173,22 +127,3 @@ export const tileIsEmptyOrOccupiedByOpponent = (
     tileIsOccupiedByOpponent(position, boardState, team)
   );
 };
-
-/*
-  if(initialPosition.y === desiredPosition.y) {
-      for(let i = 1; i < 8; i++) {
-        let multiplier = (desiredPosition.x < initialPosition.x) ? -1 : 1;
-
-        let passedPosition: Position = {x: initialPosition.x + (i * multiplier), y: initialPosition.y};
-        if(samePosition(passedPosition, desiredPosition)) {
-          if(tileIsEmptyOrOccupiedByOpponent(passedPosition, boardState, team)) {
-            return true;
-          }
-        } else {
-          if(tileIsOccupied(passedPosition, boardState)) {
-            break;
-          }
-        }
-      }
-    }
-    */

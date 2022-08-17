@@ -146,13 +146,6 @@ export default function Chessboard() {
 
               piece.position.x = x;
               piece.position.y = y;
-              piece.tilesControlled = tilesControlled(
-                currentPiece.position,
-                currentPiece.type,
-                pieces,
-                piece.team
-              );
-              console.log(currentPiece.tilesControlled);
               let promotionRow = piece.team === TeamType.WHITE ? 7 : 0;
 
               if (y === promotionRow && piece.type === PieceType.PAWN) {
@@ -171,17 +164,19 @@ export default function Chessboard() {
           }, [] as Piece[]);
 
           setPieces(updatedPieces);
+          updatedPieces.forEach((p) => {
+            p.tilesControlled = tilesControlled(
+              p.position,
+              p.type,
+              updatedPieces,
+              p.team
+            );
+          });
           if (turn === TeamType.WHITE) {
             setTurn(TeamType.BLACK);
           } else {
             setTurn(TeamType.WHITE);
           }
-          /*(let new_move = referee.NewMove(
-            currentPiece.position,
-            currentPiece.type
-          );
-          */
-          //setMoveHistory((moveHistory) => [...moveHistory, new_move]);
         } else {
           //RESETS THE PIECE POSITION
           activePiece.style.position = "relative";

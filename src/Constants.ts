@@ -32,7 +32,7 @@ export interface Piece {
   type: PieceType;
   team: TeamType;
   enPassant?: boolean;
-  tilesControlled?: Array<Position>;
+  tilesControlled: Array<Position>;
 }
 
 export const initialBoardState: Piece[] = [
