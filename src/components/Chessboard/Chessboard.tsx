@@ -14,6 +14,7 @@ import {
   samePosition,
 } from "../../Constants";
 import { tilesControlled } from "../../referee/rules/tilesControlled";
+import { isGameOver, isKingInCheck } from "../../referee/rules/Checkmate";
 
 export default function Chessboard() {
   const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
@@ -172,6 +173,8 @@ export default function Chessboard() {
               p.team
             );
           });
+          isKingInCheck(updatedPieces, currentPiece.team);
+          isGameOver(updatedPieces, currentPiece.team);
           if (turn === TeamType.WHITE) {
             setTurn(TeamType.BLACK);
           } else {

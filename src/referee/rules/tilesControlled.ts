@@ -208,7 +208,6 @@ export const tilesControlled = (
     }
   }
   if (isPieceAPawn) {
-    console.log("changing pawn tiles that it controls");
     for (let j = -1; j < 2; j = j + 2) {
       let controlledPosition: Position = {
         x: currentPosition.x + 1 * j,
