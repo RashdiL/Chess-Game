@@ -9,9 +9,10 @@ import {
   Piece,
   PieceType,
   TeamType,
-  initialBoardState,
+  //initialBoardState,
   Position,
   samePosition,
+  initialBoardStateForTesting,
 } from "../../Constants";
 import { tilesControlled } from "../../referee/rules/tilesControlled";
 import { isGameOver, isKingInCheck } from "../../referee/rules/Checkmate";
@@ -20,7 +21,7 @@ export default function Chessboard() {
   const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
   const [promotionPawn, setPromotionPawn] = useState<Piece>();
   const [grabPosition, setGrabPosition] = useState<Position>({ x: -1, y: -1 });
-  const [pieces, setPieces] = useState<Piece[]>(initialBoardState);
+  const [pieces, setPieces] = useState<Piece[]>(initialBoardStateForTesting);
   const [turn, setTurn] = useState<TeamType>(TeamType.WHITE);
   //const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const chessboardRef = useRef<HTMLDivElement>(null);
@@ -173,7 +174,7 @@ export default function Chessboard() {
               p.team
             );
           });
-          isKingInCheck(updatedPieces, currentPiece.team);
+          isKingInCheck(updatedPieces, turn);
           isGameOver(updatedPieces, currentPiece.team);
           if (turn === TeamType.WHITE) {
             setTurn(TeamType.BLACK);

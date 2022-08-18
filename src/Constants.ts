@@ -7,6 +7,26 @@ export function samePosition(p1: Position, p2: Position) {
   return p1.x === p2.x && p1.y === p2.y;
 }
 
+export function findPieceControllingThisSquare(
+  boardState: Piece[],
+  team: TeamType,
+  position: Position
+) {
+  for (let i = 0; i < boardState.length; i++) {
+    let piece = boardState[i];
+    if (piece.tilesControlled) {
+      for (let j = 0; j < piece.tilesControlled.length; j++) {
+        if (
+          samePosition(position, piece.tilesControlled[j]) &&
+          piece.team === team
+        ) {
+          return piece;
+        }
+      }
+    }
+  }
+  return false;
+}
 export interface Position {
   x: number;
   y: number;
@@ -456,5 +476,125 @@ export const initialBoardState: Piece[] = [
     type: PieceType.PAWN,
     team: TeamType.WHITE,
     tilesControlled: [{ x: 6, y: 1 }],
+  },
+];
+
+export const initialBoardStateForTesting: Piece[] = [
+  {
+    image: `assets/images/rook_b.png`,
+    position: {
+      x: 0,
+      y: 7,
+    },
+    type: PieceType.ROOK,
+    team: TeamType.BLACK,
+    tilesControlled: [
+      { x: 1, y: 7 },
+      { x: 0, y: 6 },
+    ],
+  },
+  {
+    image: `assets/images/queen_b.png`,
+    position: {
+      x: 3,
+      y: 7,
+    },
+    type: PieceType.QUEEN,
+    team: TeamType.BLACK,
+    tilesControlled: [
+      { x: 2, y: 6 },
+      { x: 3, y: 6 },
+      { x: 4, y: 6 },
+      { x: 2, y: 7 },
+      { x: 4, y: 7 },
+    ],
+  },
+  {
+    image: `assets/images/king_b.png`,
+    position: {
+      x: 4,
+      y: 7,
+    },
+    type: PieceType.KING,
+    team: TeamType.BLACK,
+    tilesControlled: [
+      { x: 3, y: 7 },
+      { x: 3, y: 6 },
+      { x: 4, y: 6 },
+      { x: 5, y: 6 },
+      { x: 5, y: 7 },
+    ],
+  },
+  {
+    image: `assets/images/rook_b.png`,
+    position: {
+      x: 7,
+      y: 7,
+    },
+    type: PieceType.ROOK,
+    team: TeamType.BLACK,
+    tilesControlled: [
+      { x: 7, y: 6 },
+      { x: 6, y: 7 },
+    ],
+  },
+
+  {
+    image: `assets/images/rook_w.png`,
+    position: {
+      x: 0,
+      y: 0,
+    },
+    type: PieceType.ROOK,
+    team: TeamType.WHITE,
+    tilesControlled: [
+      { x: 0, y: 1 },
+      { x: 1, y: 0 },
+    ],
+  },
+  {
+    image: `assets/images/queen_w.png`,
+    position: {
+      x: 3,
+      y: 0,
+    },
+    type: PieceType.QUEEN,
+    team: TeamType.WHITE,
+    tilesControlled: [
+      { x: 2, y: 0 },
+      { x: 2, y: 1 },
+      { x: 3, y: 1 },
+      { x: 4, y: 1 },
+      { x: 4, y: 0 },
+    ],
+  },
+  {
+    image: `assets/images/king_w.png`,
+    position: {
+      x: 4,
+      y: 0,
+    },
+    type: PieceType.KING,
+    team: TeamType.WHITE,
+    tilesControlled: [
+      { x: 3, y: 0 },
+      { x: 3, y: 1 },
+      { x: 4, y: 1 },
+      { x: 5, y: 1 },
+      { x: 5, y: 0 },
+    ],
+  },
+  {
+    image: `assets/images/rook_w.png`,
+    position: {
+      x: 7,
+      y: 0,
+    },
+    type: PieceType.ROOK,
+    team: TeamType.WHITE,
+    tilesControlled: [
+      { x: 7, y: 1 },
+      { x: 6, y: 0 },
+    ],
   },
 ];

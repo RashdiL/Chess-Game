@@ -117,6 +117,31 @@ export const tileIsControlledByOpponent = (
   return controlled;
 };
 
+export const tileIsControlledByUs = (
+  position: Position,
+  boardState: Piece[],
+  team: TeamType
+): boolean => {
+  let controlled = false;
+  for (let i = 0; i < boardState.length; i++) {
+    if (boardState[i].tilesControlled) {
+      for (let j = 0; j < boardState[i].tilesControlled.length; j++) {
+        if (
+          samePosition(position, boardState[i].tilesControlled[j]) &&
+          boardState[i].team === team
+        ) {
+          controlled = true;
+          break;
+        }
+      }
+      if (controlled) {
+        break;
+      }
+    }
+  }
+  return controlled;
+};
+
 export const tileIsEmptyOrOccupiedByOpponent = (
   position: Position,
   boardState: Piece[],

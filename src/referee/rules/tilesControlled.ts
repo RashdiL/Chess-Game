@@ -1,5 +1,5 @@
 import { Piece, PieceType, Position, TeamType } from "../../Constants";
-import { tileIsOccupied } from "./GeneralRules";
+import { findEnemyPiece, tileIsOccupied } from "./GeneralRules";
 
 export const tilesControlled = (
   currentPosition: Position,
@@ -42,7 +42,15 @@ export const tilesControlled = (
         }
         tilesControlled.push(controlledPosition);
         if (tileIsOccupied(controlledPosition, boardState)) {
-          break;
+          let piece = findEnemyPiece(
+            boardState,
+            controlledPosition,
+            team,
+            PieceType.KING
+          );
+          if (piece?.type !== PieceType.KING) {
+            break;
+          }
         }
       }
     }
@@ -58,7 +66,15 @@ export const tilesControlled = (
         }
         tilesControlled.push(controlledPosition);
         if (tileIsOccupied(controlledPosition, boardState)) {
-          break;
+          let piece = findEnemyPiece(
+            boardState,
+            controlledPosition,
+            team,
+            PieceType.KING
+          );
+          if (piece?.type !== PieceType.KING) {
+            break;
+          }
         }
       }
     }
@@ -81,7 +97,15 @@ export const tilesControlled = (
         }
         tilesControlled.push(controlledPosition);
         if (tileIsOccupied(controlledPosition, boardState)) {
-          break;
+          let piece = findEnemyPiece(
+            boardState,
+            controlledPosition,
+            team,
+            PieceType.KING
+          );
+          if (piece?.type !== PieceType.KING) {
+            break;
+          }
         }
       }
     }
@@ -101,7 +125,15 @@ export const tilesControlled = (
         }
         tilesControlled.push(controlledPosition);
         if (tileIsOccupied(controlledPosition, boardState)) {
-          break;
+          let piece = findEnemyPiece(
+            boardState,
+            controlledPosition,
+            team,
+            PieceType.KING
+          );
+          if (piece?.type !== PieceType.KING) {
+            break;
+          }
         }
       }
     }
