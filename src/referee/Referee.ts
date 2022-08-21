@@ -14,6 +14,7 @@ import {
   rookMove,
   queenMove,
   kingMove,
+  doesKingHaveToMove,
 } from "./rules";
 
 export default class Referee {
@@ -67,6 +68,11 @@ export default class Referee {
     boardState: Piece[]
   ) {
     let validMove = false;
+    if (doesKingHaveToMove(boardState, team)) {
+      if (type !== PieceType.KING) {
+        return false;
+      }
+    }
     switch (type) {
       case PieceType.PAWN:
         validMove = pawnMove(

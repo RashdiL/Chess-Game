@@ -27,11 +27,32 @@ export function findPieceControllingThisSquare(
   }
   return false;
 }
+
 export interface Position {
   x: number;
   y: number;
 }
-
+export function findPiecesControllingThisSquare(
+  boardState: Piece[],
+  team: TeamType,
+  position: Position
+) {
+  let piecesControllingTheSquare: Piece[] = [];
+  for (let i = 0; i < boardState.length; i++) {
+    let piece = boardState[i];
+    if (piece.tilesControlled) {
+      for (let j = 0; j < piece.tilesControlled.length; j++) {
+        if (
+          samePosition(position, piece.tilesControlled[j]) &&
+          piece.team === team
+        ) {
+          piecesControllingTheSquare.push(piece);
+        }
+      }
+    }
+  }
+  return piecesControllingTheSquare;
+}
 export enum PieceType {
   PAWN,
   BISHOP,

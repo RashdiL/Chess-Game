@@ -1,7 +1,7 @@
 import { Piece, Position, samePosition, TeamType } from "../../Constants";
 import {
   tileIsEmptyOrOccupiedByOpponent,
-  tileIsOccupied,
+  isTileOccupied,
 } from "./GeneralRules";
 
 export const rookMove = (
@@ -23,7 +23,7 @@ export const rookMove = (
           return true;
         }
       } else {
-        if (tileIsOccupied(passedPosition, boardState)) {
+        if (isTileOccupied(passedPosition, boardState)) {
           break;
         }
       }
@@ -43,7 +43,7 @@ export const rookMove = (
           return true;
         }
       } else {
-        if (tileIsOccupied(passedPosition, boardState)) {
+        if (isTileOccupied(passedPosition, boardState)) {
           break;
         }
       }
@@ -65,7 +65,7 @@ export const rookControls = (
         y: currentPosition.y + i * j,
       };
       if (
-        tileIsOccupied(controlledPosition, boardState) ||
+        isTileOccupied(controlledPosition, boardState) ||
         controlledPosition.y < 0 ||
         controlledPosition.y > 7
       ) {
@@ -82,7 +82,7 @@ export const rookControls = (
         y: currentPosition.y,
       };
       if (
-        tileIsOccupied(controlledPosition, boardState) ||
+        isTileOccupied(controlledPosition, boardState) ||
         controlledPosition.x < 0 ||
         controlledPosition.x > 7
       ) {

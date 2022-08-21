@@ -1,72 +1,18 @@
 import {
   findPieceControllingThisSquare,
+  findPiecesControllingThisSquare,
   Piece,
   PieceType,
   Position,
   TeamType,
 } from "../../Constants";
-import { tileIsControlledByOpponent, tileIsOccupied } from "./GeneralRules";
-export const isKingInCheck = (boardState: Piece[], team: TeamType) => {
-  const king = boardState.find((p) => {
-    if (p.type === PieceType.KING && p.team !== team) {
-      return p;
-    }
-    return false;
-  });
-  if (
-    king &&
-    tileIsControlledByOpponent(king?.position, boardState, king.team)
-  ) {
-    console.log("CHECK");
-    return true;
-  }
-  return false;
-};
-export function getPieceGivingCheck(boardState: Piece[], team: TeamType) {
-  const king = boardState.find((p) => {
-    if (p.type === PieceType.KING && p.team !== team) {
-      return p;
-    }
-    return false;
-  });
-  if (
-    king &&
-    tileIsControlledByOpponent(king?.position, boardState, king.team)
-  ) {
-    let pieceChecking = findPieceControllingThisSquare(
-      boardState,
-      team,
-      king.position
-    );
-    return pieceChecking;
-  }
-  return false;
-}
-//this must execute before the "enemy" gets to play or right after the player with the legal turn plays a legal move.
-export function isCheckHorizontalVerticalOrDiagonal(
-  boardState: Piece[],
-  team: TeamType
-) {
-  let checkType = "";
-  console.log("searching");
-  if (!isKingInCheck(boardState, team)) return false;
-  const king = boardState.find((p) => {
-    if (p.type === PieceType.KING && p.team !== team) {
-      return p;
-    }
-    return false;
-  });
-  let piece = getPieceGivingCheck(boardState, team);
-  if (!piece || !king) return false;
-  if (piece.position.x - king?.position.x === 0) {
-    checkType = "vertical";
-  } else if (piece.position.y - king.position.y === 0) {
-    checkType = "horizontal";
-  } else {
-    checkType = "diagonal";
-  }
-  return checkType;
-}
+import {
+  canCheckGetBlocked,
+  getPieceGivingCheck,
+  isKingInCheck,
+} from "./Check";
+import { isTileControlledByAPiece, isTileOccupied } from "./GeneralRules";
+
 export const canKingMove = (boardState: Piece[], team: TeamType) => {
   const king = boardState.find((p) => {
     if (p.type === PieceType.KING && p.team !== team) {
@@ -90,8 +36,8 @@ export const canKingMove = (boardState: Piece[], team: TeamType) => {
         continue;
       }
       if (
-        !tileIsControlledByOpponent(checkingPosition, boardState, king.team) &&
-        !tileIsOccupied(checkingPosition, boardState)
+        !isTileControlledByAPiece(checkingPosition, boardState, team) &&
+        !isTileOccupied(checkingPosition, boardState, king.team)
       ) {
         kingCanMove = true;
         break;
@@ -112,12 +58,8 @@ export const canKingMove = (boardState: Piece[], team: TeamType) => {
           continue;
         }
         if (
-          !tileIsControlledByOpponent(
-            checkingPosition,
-            boardState,
-            king.team
-          ) &&
-          !tileIsOccupied(checkingPosition, boardState)
+          !isTileControlledByAPiece(checkingPosition, boardState, team) &&
+          !isTileOccupied(checkingPosition, boardState, king.team)
         ) {
           kingCanMove = true;
           break;
@@ -140,12 +82,8 @@ export const canKingMove = (boardState: Piece[], team: TeamType) => {
           continue;
         }
         if (
-          !tileIsControlledByOpponent(
-            checkingPosition,
-            boardState,
-            king.team
-          ) &&
-          !tileIsOccupied(checkingPosition, boardState)
+          !isTileControlledByAPiece(checkingPosition, boardState, team) &&
+          !isTileOccupied(checkingPosition, boardState, king.team)
         ) {
           kingCanMove = true;
           break;
@@ -167,12 +105,8 @@ export const canKingMove = (boardState: Piece[], team: TeamType) => {
           continue;
         }
         if (
-          !tileIsControlledByOpponent(
-            checkingPosition,
-            boardState,
-            king.team
-          ) &&
-          !tileIsOccupied(checkingPosition, boardState)
+          !isTileControlledByAPiece(checkingPosition, boardState, team) &&
+          !isTileOccupied(checkingPosition, boardState, king.team)
         ) {
           kingCanMove = true;
           break;
@@ -181,7 +115,6 @@ export const canKingMove = (boardState: Piece[], team: TeamType) => {
     }
   }
   if (!kingCanMove) {
-    console.log("King can't move.");
   }
   return kingCanMove;
 };
@@ -191,19 +124,65 @@ export const canPieceGetCaptured = (
   team: TeamType,
   piece: Piece
 ) => {
-  if (tileIsControlledByOpponent(piece.position, boardState, team)) {
+  const king = boardState.find((p) => {
+    if (p.type === PieceType.KING && p.team !== team) {
+      return p;
+    }
+    return false;
+  });
+  if (!king) return;
+  if (!isTileControlledByAPiece(piece.position, boardState, king.team))
+    return false;
+  const piecesControllingTheSquare = findPiecesControllingThisSquare(
+    boardState,
+    king.team,
+    piece.position
+  );
+  if (piecesControllingTheSquare.length > 1) {
     return true;
   }
-  return false;
+  const doesKingControlTheSquare = piecesControllingTheSquare.find((p) => {
+    if (p.type === PieceType.KING) {
+      return true;
+    }
+    return false;
+  });
+  if (!doesKingControlTheSquare) {
+    return true;
+  }
+  const doesOurTeamControlTheSquare = findPieceControllingThisSquare(
+    boardState,
+    team,
+    piece.position
+  );
+  if (doesOurTeamControlTheSquare) {
+    return false;
+  } else {
+    return true;
+  }
 };
+
 export const isGameOver = (boardState: Piece[], team: TeamType) => {
   let result = false;
-  console.log(isCheckHorizontalVerticalOrDiagonal(boardState, team));
+  const king = boardState.find((p) => {
+    if (p.type === PieceType.KING && p.team !== team) {
+      return p;
+    }
+    return false;
+  });
   if (!isKingInCheck(boardState, team) || canKingMove(boardState, team)) {
     return result;
   }
   let pieceChecking = getPieceGivingCheck(boardState, team);
-  if (pieceChecking && canPieceGetCaptured(boardState, team, pieceChecking)) {
+  if (!pieceChecking || !king) return result;
+  if (canPieceGetCaptured(boardState, team, pieceChecking)) {
+  }
+  if (canCheckGetBlocked(boardState, team)) {
+  }
+  if (
+    canPieceGetCaptured(boardState, team, pieceChecking) ||
+    canCheckGetBlocked(boardState, team)
+  ) {
     return result;
   }
   result = true;

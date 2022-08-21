@@ -13,9 +13,11 @@ import {
   Position,
   samePosition,
   initialBoardStateForTesting,
+  //initialBoardState,
 } from "../../Constants";
 import { tilesControlled } from "../../referee/rules/tilesControlled";
-import { isGameOver, isKingInCheck } from "../../referee/rules/Checkmate";
+import { isGameOver } from "../../referee/rules/Checkmate";
+import { isKingInCheck } from "../../referee/rules/Check";
 
 export default function Chessboard() {
   const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
@@ -45,7 +47,6 @@ export default function Chessboard() {
       setActivePiece(element);
     }
   }
-
   function movePiece(e: React.MouseEvent) {
     const chessboard = chessboardRef.current;
     if (activePiece && chessboard) {
@@ -84,7 +85,6 @@ export default function Chessboard() {
       }
     }
   }
-
   function dropPiece(e: React.MouseEvent) {
     const chessboard = chessboardRef.current;
     if (activePiece && chessboard) {

@@ -1,5 +1,6 @@
 import { Piece, PieceType, Position, TeamType } from "../../Constants";
-import { findEnemyPiece, tileIsOccupied } from "./GeneralRules";
+import { isTileOccupied } from "./GeneralRules";
+import { findPieceInSpecificPosition } from "./GeneralRules";
 
 export const tilesControlled = (
   currentPosition: Position,
@@ -7,6 +8,7 @@ export const tilesControlled = (
   boardState: Piece[],
   team: TeamType
 ) => {
+  let oppositeTeam = team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
   let tilesControlled = [];
   let canPieceMoveVerticallyOrHorizontally = false;
   let canPieceMoveDiagonally = false;
@@ -41,11 +43,11 @@ export const tilesControlled = (
           break;
         }
         tilesControlled.push(controlledPosition);
-        if (tileIsOccupied(controlledPosition, boardState)) {
-          let piece = findEnemyPiece(
+        if (isTileOccupied(controlledPosition, boardState)) {
+          let piece = findPieceInSpecificPosition(
             boardState,
             controlledPosition,
-            team,
+            oppositeTeam,
             PieceType.KING
           );
           if (piece?.type !== PieceType.KING) {
@@ -65,11 +67,11 @@ export const tilesControlled = (
           break;
         }
         tilesControlled.push(controlledPosition);
-        if (tileIsOccupied(controlledPosition, boardState)) {
-          let piece = findEnemyPiece(
+        if (isTileOccupied(controlledPosition, boardState)) {
+          let piece = findPieceInSpecificPosition(
             boardState,
             controlledPosition,
-            team,
+            oppositeTeam,
             PieceType.KING
           );
           if (piece?.type !== PieceType.KING) {
@@ -96,11 +98,11 @@ export const tilesControlled = (
           break;
         }
         tilesControlled.push(controlledPosition);
-        if (tileIsOccupied(controlledPosition, boardState)) {
-          let piece = findEnemyPiece(
+        if (isTileOccupied(controlledPosition, boardState)) {
+          let piece = findPieceInSpecificPosition(
             boardState,
             controlledPosition,
-            team,
+            oppositeTeam,
             PieceType.KING
           );
           if (piece?.type !== PieceType.KING) {
@@ -124,11 +126,11 @@ export const tilesControlled = (
           break;
         }
         tilesControlled.push(controlledPosition);
-        if (tileIsOccupied(controlledPosition, boardState)) {
-          let piece = findEnemyPiece(
+        if (isTileOccupied(controlledPosition, boardState)) {
+          let piece = findPieceInSpecificPosition(
             boardState,
             controlledPosition,
-            team,
+            oppositeTeam,
             PieceType.KING
           );
           if (piece?.type !== PieceType.KING) {

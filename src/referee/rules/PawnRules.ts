@@ -1,5 +1,5 @@
 import { Piece, Position, TeamType } from "../../Constants";
-import { tileIsOccupied, tileIsOccupiedByOpponent } from "./GeneralRules";
+import { isTileOccupied } from "./GeneralRules";
 
 export const pawnMove = (
   initialPosition: Position,
@@ -7,6 +7,7 @@ export const pawnMove = (
   team: TeamType,
   boardState: Piece[]
 ): boolean => {
+  let oppositeTeam = team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
   const specialRow = team === TeamType.WHITE ? 1 : 6;
   const pawnDirection = team === TeamType.WHITE ? 1 : -1;
 
@@ -17,8 +18,8 @@ export const pawnMove = (
     desiredPosition.y - initialPosition.y === 2 * pawnDirection
   ) {
     if (
-      !tileIsOccupied(desiredPosition, boardState) &&
-      !tileIsOccupied(
+      !isTileOccupied(desiredPosition, boardState) &&
+      !isTileOccupied(
         { x: desiredPosition.x, y: desiredPosition.y - pawnDirection },
         boardState
       )
@@ -29,7 +30,7 @@ export const pawnMove = (
     initialPosition.x === desiredPosition.x &&
     desiredPosition.y - initialPosition.y === pawnDirection
   ) {
-    if (!tileIsOccupied(desiredPosition, boardState)) {
+    if (!isTileOccupied(desiredPosition, boardState)) {
       return true;
     }
   }
@@ -39,7 +40,7 @@ export const pawnMove = (
     desiredPosition.y - initialPosition.y === pawnDirection
   ) {
     //ATTACK IN UPPER OR BOTTOM LEFT CORNER
-    if (tileIsOccupiedByOpponent(desiredPosition, boardState, team)) {
+    if (isTileOccupied(desiredPosition, boardState, oppositeTeam)) {
       return true;
     }
   } else if (
@@ -47,7 +48,7 @@ export const pawnMove = (
     desiredPosition.y - initialPosition.y === pawnDirection
   ) {
     //ATTACK IN THE UPPER OR BOTTOM RIGHT CORNER
-    if (tileIsOccupiedByOpponent(desiredPosition, boardState, team)) {
+    if (isTileOccupied(desiredPosition, boardState, oppositeTeam)) {
       return true;
     }
   }
