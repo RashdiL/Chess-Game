@@ -98,12 +98,39 @@ export default function Chessboard() {
       );
 
       if (currentPiece) {
+        let piecesCopy = JSON.parse(JSON.stringify(pieces));
+        const potentialBoardState = piecesCopy.reduce(
+          (results: Piece[], piece: Piece) => {
+            if (samePosition(piece.position, grabPosition)) {
+              piece.position.x = x;
+              piece.position.y = y;
+              results.push(piece);
+            } else if (!samePosition(piece.position, { x, y })) {
+              if (piece.type === PieceType.PAWN) {
+                piece.enPassant = false;
+              }
+              results.push(piece);
+            }
+
+            return results;
+          },
+          [] as Piece[]
+        );
+        potentialBoardState.forEach((p: Piece) => {
+          p.tilesControlled = tilesControlled(
+            p.position,
+            p.type,
+            potentialBoardState,
+            p.team
+          );
+        });
         const validMove = referee.isValidMove(
           grabPosition,
           { x, y },
           currentPiece.type,
           currentPiece.team,
-          pieces
+          pieces,
+          potentialBoardState
         );
 
         const isEnPassantMove = referee.isEnPassantMove(

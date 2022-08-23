@@ -16,6 +16,7 @@ import {
   kingMove,
   doesKingHaveToMove,
 } from "./rules";
+import { isKingInCheck } from "./rules/Check";
 
 export default class Referee {
   isEnPassantMove(
@@ -65,9 +66,13 @@ export default class Referee {
     desiredPosition: Position,
     type: PieceType,
     team: TeamType,
-    boardState: Piece[]
+    boardState: Piece[],
+    potentialBoardState: Piece[]
   ) {
     let validMove = false;
+    const oppositeTeam =
+      team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
+    if (isKingInCheck(potentialBoardState, oppositeTeam)) return false;
     if (doesKingHaveToMove(boardState, team)) {
       if (type !== PieceType.KING) {
         return false;
