@@ -18,6 +18,7 @@ import {
 import { tilesControlled } from "../../referee/rules/tilesControlled";
 import { isGameOver } from "../../referee/rules/Checkmate";
 import { isKingInCheck } from "../../referee/rules/Check";
+import { grabPiece } from "./PieceMovement";
 
 export default function Chessboard() {
   const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
@@ -25,6 +26,16 @@ export default function Chessboard() {
   const [grabPosition, setGrabPosition] = useState<Position>({ x: -1, y: -1 });
   const [pieces, setPieces] = useState<Piece[]>(initialBoardStateForTesting);
   const [turn, setTurn] = useState<TeamType>(TeamType.WHITE);
+  const [didKingsBlackRookMove, setDidKingsBlackRookMove] =
+    useState<boolean>(false);
+  const [didQueensBlackRookMove, setDidQueensBlackRookMove] =
+    useState<boolean>(false);
+  const [didKingsWhiteRookMove, setDidKingsWhiteRookMove] =
+    useState<boolean>(false);
+  const [didQueensWhiteRookMove, setDidQueensWhiteRookMove] =
+    useState<boolean>(false);
+  const [didBlackKingMove, setDidBlackKingMove] = useState<boolean>(false);
+  const [didWhiteKingMove, setDidwhiteKingMove] = useState<boolean>(false);
   //const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const chessboardRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -124,13 +135,28 @@ export default function Chessboard() {
             p.team
           );
         });
+        let didKingMove =
+          currentPiece.team === TeamType.WHITE
+            ? didWhiteKingMove
+            : didBlackKingMove;
+        let didKingsRookMove =
+          currentPiece.team === TeamType.WHITE
+            ? didKingsWhiteRookMove
+            : didKingsBlackRookMove;
+        let didQueensRookMove =
+          currentPiece.team === TeamType.WHITE
+            ? didQueensWhiteRookMove
+            : didQueensBlackRookMove;
         const validMove = referee.isValidMove(
           grabPosition,
           { x, y },
           currentPiece.type,
           currentPiece.team,
           pieces,
-          potentialBoardState
+          potentialBoardState,
+          didKingMove,
+          didKingsRookMove,
+          didQueensRookMove
         );
 
         const isEnPassantMove = referee.isEnPassantMove(
@@ -166,6 +192,56 @@ export default function Chessboard() {
         } else if (validMove && currentPiece.team === turn) {
           //UPDATES THE PIECE POSITION
           //AND IF A PIECE IS ATTACKED, REMOVES IT
+          const queensBlackRookPosition: Position = { x: 0, y: 7 };
+          const queensWhiteRookPosition: Position = { x: 0, y: 0 };
+          const kingsBlackRookPosition: Position = { x: 7, y: 7 };
+          const kingsWhiteRookPosition: Position = { x: 7, y: 0 };
+          if (
+            currentPiece.type === PieceType.ROOK &&
+            (didKingsBlackRookMove ||
+              didKingsWhiteRookMove ||
+              didQueensBlackRookMove ||
+              didQueensWhiteRookMove)
+          ) {
+            if (
+              currentPiece.team === TeamType.WHITE &&
+              currentPiece.position === queensWhiteRookPosition
+            ) {
+              setDidQueensWhiteRookMove(true);
+            }
+
+            if (
+              currentPiece.team === TeamType.WHITE &&
+              currentPiece.position === kingsWhiteRookPosition
+            ) {
+              setDidKingsWhiteRookMove(true);
+            }
+
+            if (
+              currentPiece.team === TeamType.BLACK &&
+              currentPiece.position === queensBlackRookPosition
+            ) {
+              setDidQueensBlackRookMove(true);
+            }
+
+            if (
+              currentPiece.team === TeamType.BLACK &&
+              currentPiece.position === kingsBlackRookPosition
+            ) {
+              setDidKingsBlackRookMove(true);
+            }
+          }
+
+          if (
+            currentPiece.type === PieceType.KING &&
+            (didBlackKingMove || didWhiteKingMove)
+          ) {
+            if (currentPiece.team === TeamType.WHITE) {
+              setDidwhiteKingMove(true);
+            } else {
+              setDidBlackKingMove(true);
+            }
+          }
           const updatedPieces = pieces.reduce((results, piece) => {
             if (samePosition(piece.position, grabPosition)) {
               //SPECIAL MOVE

@@ -10,9 +10,20 @@ export const kingMove = (
   initialPosition: Position,
   desiredPosition: Position,
   team: TeamType,
-  boardState: Piece[]
+  boardState: Piece[],
+  didKingMove: boolean,
+  didKingsRookMove: boolean,
+  didQueensRookMove: boolean
 ): boolean => {
   let oppositeTeam = team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
+  //Check if we are trying to castle
+  let castlingY = team === TeamType.WHITE ? 0 : 7;
+  let castlingXKingSide = 6;
+  let castlingXQueenSide = 2;
+  let kingSideCastlePosition: Position = { x: 6, y: castlingY };
+  let queenSideCastlePosition: Position = { x: 2, y: castlingY };
+  if (desiredPosition === kingSideCastlePosition) {
+  }
   for (let i = 1; i < 2; i++) {
     //Diagonal
     let multiplierX =

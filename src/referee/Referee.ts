@@ -67,7 +67,10 @@ export default class Referee {
     type: PieceType,
     team: TeamType,
     boardState: Piece[],
-    potentialBoardState: Piece[]
+    potentialBoardState: Piece[],
+    didKingMove: boolean,
+    didKingsRookMove: boolean,
+    didQueensRookMove: boolean
   ) {
     let validMove = false;
     const oppositeTeam =
@@ -124,7 +127,10 @@ export default class Referee {
           initialPosition,
           desiredPosition,
           team,
-          boardState
+          boardState,
+          didKingMove,
+          didKingsRookMove,
+          didQueensRookMove
         );
     }
 
