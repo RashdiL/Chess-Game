@@ -67,15 +67,15 @@ export default class Referee {
     type: PieceType,
     team: TeamType,
     boardState: Piece[],
-    potentialBoardState: Piece[],
-    didKingMove: boolean,
-    didKingsRookMove: boolean,
-    didQueensRookMove: boolean
+    potentialBoardState?: Piece[],
+    didKingMove?: boolean,
+    didKingsRookMove?: boolean,
+    didQueensRookMove?: boolean
   ) {
     let validMove = false;
     const oppositeTeam =
       team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
-    if (isKingInCheck(potentialBoardState, oppositeTeam)) return false;
+    //if (isKingInCheck(potentialBoardState, oppositeTeam)) return false;
     if (doesKingHaveToMove(boardState, team)) {
       if (type !== PieceType.KING) {
         return false;

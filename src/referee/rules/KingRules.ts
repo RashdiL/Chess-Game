@@ -11,9 +11,9 @@ export const kingMove = (
   desiredPosition: Position,
   team: TeamType,
   boardState: Piece[],
-  didKingMove: boolean,
-  didKingsRookMove: boolean,
-  didQueensRookMove: boolean
+  didKingMove?: boolean,
+  didKingsRookMove?: boolean,
+  didQueensRookMove?: boolean
 ): boolean => {
   let oppositeTeam = team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
   //Check if we are trying to castle
