@@ -86,7 +86,6 @@ export function dropPiece(
     samePosition(p.position, grabPosition)
   );
   if (!currentPiece) return;
-  if (currentPiece.team !== turn) return;
   const validMove = referee.isValidMove(
     grabPosition,
     { x, y },
@@ -95,7 +94,7 @@ export function dropPiece(
     pieces
   );
 
-  if (validMove) {
+  if (validMove && currentPiece.team === turn) {
     const updatedPieces = pieces.reduce((results, piece) => {
       if (samePosition(piece.position, grabPosition)) {
         piece.position = desiredPosition;

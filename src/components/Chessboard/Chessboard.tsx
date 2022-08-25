@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./Chessboard.css";
 import Tile from "../Tile/Tile";
 import Referee from "../../referee/Referee";
@@ -15,12 +15,9 @@ import {
   initialBoardStateForTesting,
   //initialBoardState,
 } from "../../Constants";
-import { tilesControlled } from "../../referee/rules/tilesControlled";
-import { isGameOver } from "../../referee/rules/Checkmate";
-import { isKingInCheck } from "../../referee/rules/Check";
 import { grabPiece, movePiece, dropPiece } from "./PieceMovement";
 
-export default function Chessboard() {
+export default function Chessboard({}) {
   const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
   const [promotionPawn, setPromotionPawn] = useState<Piece>();
   const [grabPosition, setGrabPosition] = useState<Position>({ x: -1, y: -1 });
@@ -102,9 +99,8 @@ export default function Chessboard() {
   function promotionTeamType() {
     return promotionPawn?.team === TeamType.WHITE ? "w" : "b";
   }
-
   let board = [];
-
+  console.log("running once");
   for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
     for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
       const number = j + i + 2;
@@ -116,7 +112,6 @@ export default function Chessboard() {
       board.push(<Tile key={`${j},${i}`} image={image} number={number} />);
     }
   }
-
   return (
     <>
       <div id="pawn-promotion-modal" className="hidden" ref={modalRef}>
