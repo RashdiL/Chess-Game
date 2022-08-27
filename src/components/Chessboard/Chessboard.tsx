@@ -74,7 +74,9 @@ export default function Chessboard() {
         activePiece,
         setActivePiece,
         castlingPieceMoveHistory,
-        setCastlingPieceMoveHistory
+        setCastlingPieceMoveHistory,
+        setPromotionPawn,
+        modalRef
       );
     }
   }

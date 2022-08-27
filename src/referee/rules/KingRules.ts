@@ -40,9 +40,6 @@ export const kingMove = (
         tileIsEmptyOrOccupiedByOpponent(passedPosition, boardState, team) &&
         !isTileControlledByAPiece(desiredPosition, boardState, oppositeTeam)
       ) {
-        console.log(
-          "tile is not controlled by opponent, contains an enemy piece, or it is empty"
-        );
         return true;
       }
     }

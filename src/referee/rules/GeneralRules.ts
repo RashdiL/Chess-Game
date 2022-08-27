@@ -80,13 +80,9 @@ export const tileIsEmptyOrOccupiedByOpponent = (
 ) => {
   let oppositeTeam = team === TeamType.BLACK ? TeamType.WHITE : TeamType.BLACK;
   if (!isTileOccupied(position, boardState)) {
-    console.log(`Tile is empty`);
   }
   if (isTileOccupied(position, boardState, oppositeTeam)) {
-    console.log(oppositeTeam);
-    console.log("enemy on the tile");
     let piece = findPieceInSpecificPosition(boardState, position, oppositeTeam);
-    console.log(`enemy piece is ${piece?.team}`);
   }
   return (
     !isTileOccupied(position, boardState) ||

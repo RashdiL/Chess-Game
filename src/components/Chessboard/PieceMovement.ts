@@ -134,7 +134,9 @@ export function dropPiece(
   castlingPieceMoveHistory: castlingPieceMoveHistory,
   setCastlingMoves: React.Dispatch<
     React.SetStateAction<castlingPieceMoveHistory>
-  >
+  >,
+  setPromotionPawn: React.Dispatch<React.SetStateAction<Piece | undefined>>,
+  modalRef: React.RefObject<HTMLDivElement>
 ) {
   //the x and y coords below are the coords of where you are trying to drop your piece.
   const x = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
@@ -149,7 +151,6 @@ export function dropPiece(
   if (
     isPlayerTryingToCastle(currentPiece, desiredPosition, currentPiece.team)
   ) {
-    console.log("player is trying to castle");
     const validCastle = referee.isValidCastle(
       grabPosition,
       desiredPosition,
@@ -215,10 +216,15 @@ export function dropPiece(
   );
 
   if (validMove && currentPiece.team === turn) {
+    let promotionRow = currentPiece.team === TeamType.WHITE ? 7 : 0;
     adjustPieceMoveHistory(castlingPieceMoveHistory, currentPiece);
     const updatedPieces = pieces.reduce((results, piece) => {
       if (samePosition(piece.position, grabPosition)) {
         piece.position = desiredPosition;
+        if (y === promotionRow && piece.type === PieceType.PAWN) {
+          modalRef.current?.classList.remove("hidden");
+          setPromotionPawn(piece);
+        }
         results.push(piece);
       } else if (!samePosition(piece.position, desiredPosition)) {
         if (piece.type === PieceType.PAWN) {
