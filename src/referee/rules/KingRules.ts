@@ -1,10 +1,4 @@
-import {
-  castlingPieceMoveHistory,
-  Piece,
-  Position,
-  samePosition,
-  TeamType,
-} from "../../Constants";
+import { Piece, Position, samePosition, TeamType } from "../../Constants";
 import {
   tileIsEmptyOrOccupiedByOpponent,
   isTileOccupied,

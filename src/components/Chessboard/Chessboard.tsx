@@ -25,7 +25,6 @@ export default function Chessboard() {
   const [turn, setTurn] = useState<TeamType>(TeamType.WHITE);
   const [castlingPieceMoveHistory, setCastlingPieceMoveHistory] =
     useState<castlingPieceMoveHistory>(initialCastlingState);
-  //const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const chessboardRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   function initialBoard(initialBoardState: Piece[]) {
