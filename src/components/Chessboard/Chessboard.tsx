@@ -13,6 +13,7 @@ import {
   Position,
   samePosition,
   initialBoardStateForTesting,
+  initialBoardState,
   //initialBoardState,
 } from "../../Constants";
 import { tilesControlled } from "../../referee/rules/tilesControlled";
@@ -24,7 +25,7 @@ export default function Chessboard() {
   const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
   const [promotionPawn, setPromotionPawn] = useState<Piece>();
   const [grabPosition, setGrabPosition] = useState<Position>({ x: -1, y: -1 });
-  const [pieces, setPieces] = useState<Piece[]>(initialBoardStateForTesting);
+  const [pieces, setPieces] = useState<Piece[]>(initialBoardState);
   const [turn, setTurn] = useState<TeamType>(TeamType.WHITE);
   const [didKingsBlackRookMove, setDidKingsBlackRookMove] =
     useState<boolean>(false);
