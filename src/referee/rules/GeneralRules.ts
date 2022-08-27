@@ -25,28 +25,27 @@ export const findPieceInSpecificPosition = (
   team?: TeamType,
   type?: PieceType
 ) => {
-  if (!team && !type) {
-    const piece = boardState.find((p) => samePosition(p.position, position));
-    return piece;
+  var piece, teamExists;
+  if (team === TeamType.WHITE || team === TeamType.BLACK) {
+    teamExists = true;
   }
-  if (team && type) {
-    const piece = boardState.find(
+  if (!teamExists && !type) {
+    piece = boardState.find((p) => samePosition(p.position, position));
+  } else if (teamExists && type) {
+    piece = boardState.find(
       (p) =>
         samePosition(p.position, position) && p.team === team && p.type === type
     );
-    return piece;
-  }
-  if (type) {
-    const piece = boardState.find(
+  } else if (type) {
+    piece = boardState.find(
       (p) => samePosition(p.position, position) && p.type === type
     );
-    return piece;
-  } else {
-    const piece = boardState.find(
+  } else if (teamExists) {
+    piece = boardState.find(
       (p) => samePosition(p.position, position) && p.team === team
     );
-    return piece;
   }
+  return piece;
 };
 
 export const isTileControlledByAPiece = (
@@ -80,6 +79,15 @@ export const tileIsEmptyOrOccupiedByOpponent = (
   team: TeamType
 ) => {
   let oppositeTeam = team === TeamType.BLACK ? TeamType.WHITE : TeamType.BLACK;
+  if (!isTileOccupied(position, boardState)) {
+    console.log(`Tile is empty`);
+  }
+  if (isTileOccupied(position, boardState, oppositeTeam)) {
+    console.log(oppositeTeam);
+    console.log("enemy on the tile");
+    let piece = findPieceInSpecificPosition(boardState, position, oppositeTeam);
+    console.log(`enemy piece is ${piece?.team}`);
+  }
   return (
     !isTileOccupied(position, boardState) ||
     isTileOccupied(position, boardState, oppositeTeam)

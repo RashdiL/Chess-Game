@@ -1,11 +1,50 @@
+import { tilesControlled } from "./referee/rules/tilesControlled";
 export const VERTICAL_AXIS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 export const HORIZONTAL_AXIS = ["a", "b", "c", "d", "e", "f", "g", "h"];
 export const GRID_SIZE = 100;
-
+export enum PieceType {
+  PAWN,
+  BISHOP,
+  KNIGHT,
+  ROOK,
+  QUEEN,
+  KING,
+}
 export function samePosition(p1: Position, p2: Position) {
   return p1.x === p2.x && p1.y === p2.y;
 }
+export function setBoard(
+  boardState: Piece[],
+  initialPosition: Position,
+  desiredPosition: Position
+) {
+  let piecesCopy = JSON.parse(JSON.stringify(boardState));
+  const potentialBoardState = piecesCopy.reduce(
+    (results: Piece[], piece: Piece) => {
+      if (samePosition(piece.position, initialPosition)) {
+        piece.position = desiredPosition;
+        results.push(piece);
+      } else if (!samePosition(piece.position, desiredPosition)) {
+        if (piece.type === PieceType.PAWN) {
+          piece.enPassant = false;
+        }
+        results.push(piece);
+      }
 
+      return results;
+    },
+    [] as Piece[]
+  );
+  potentialBoardState.forEach((p: Piece) => {
+    p.tilesControlled = tilesControlled(
+      p.position,
+      p.type,
+      potentialBoardState,
+      p.team
+    );
+  });
+  return potentialBoardState;
+}
 export function findPieceControllingThisSquare(
   boardState: Piece[],
   team: TeamType,
@@ -52,13 +91,13 @@ export function findPiecesControllingThisSquare(
   }
   return piecesControllingTheSquare;
 }
-export enum PieceType {
-  PAWN,
-  BISHOP,
-  KNIGHT,
-  ROOK,
-  QUEEN,
-  KING,
+export interface castlingPieceMoveHistory {
+  didWhiteKingMove: boolean;
+  didBlackKingMove: boolean;
+  didWQueenRookMove: boolean;
+  didBQueenRookMove: boolean;
+  didWKingRookMove: boolean;
+  didBKingRookMove: boolean;
 }
 
 export enum TeamType {
@@ -74,7 +113,14 @@ export interface Piece {
   enPassant?: boolean;
   tilesControlled: Array<Position>;
 }
-
+export const initialCastlingState: castlingPieceMoveHistory = {
+  didWhiteKingMove: false,
+  didBlackKingMove: false,
+  didWQueenRookMove: false,
+  didBQueenRookMove: false,
+  didWKingRookMove: false,
+  didBKingRookMove: false,
+};
 export const initialBoardState: Piece[] = [
   {
     image: `assets/images/rook_b.png`,
@@ -618,3 +664,22 @@ export const initialBoardStateForTesting: Piece[] = [
     ],
   },
 ];
+
+export function isPlayerTryingToCastle(
+  currentPiece: Piece,
+  desiredPosition: Position,
+  team: TeamType
+) {
+  let castlingY = team === TeamType.WHITE ? 0 : 7;
+  let kingSideCastlePosition: Position = { x: 6, y: castlingY };
+  let queenSideCastlePosition: Position = { x: 2, y: castlingY };
+  if (currentPiece.type !== PieceType.KING) return false;
+  if (!samePosition(currentPiece.position, { x: 4, y: castlingY }))
+    return false;
+  if (
+    samePosition(desiredPosition, kingSideCastlePosition) ||
+    samePosition(desiredPosition, queenSideCastlePosition)
+  ) {
+    return true;
+  }
+}

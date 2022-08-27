@@ -1,31 +1,52 @@
 import { useEffect, useRef, useState } from "react";
 import "./Chessboard.css";
-import Tile from "../Tile/Tile";
-import Referee from "../../referee/Referee";
 import {
-  VERTICAL_AXIS,
-  HORIZONTAL_AXIS,
   GRID_SIZE,
   Piece,
   PieceType,
   TeamType,
-  //initialBoardState,
+  initialBoardState,
   Position,
   samePosition,
   initialBoardStateForTesting,
-  //initialBoardState,
+  castlingPieceMoveHistory,
+  initialCastlingState,
+  VERTICAL_AXIS,
+  HORIZONTAL_AXIS,
 } from "../../Constants";
 import { grabPiece, movePiece, dropPiece } from "./PieceMovement";
+import Tile from "../Tile/Tile";
 
-export default function Chessboard({}) {
+export default function Chessboard() {
   const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
   const [promotionPawn, setPromotionPawn] = useState<Piece>();
   const [grabPosition, setGrabPosition] = useState<Position>({ x: -1, y: -1 });
-  const [pieces, setPieces] = useState<Piece[]>(initialBoardStateForTesting);
+  const [pieces, setPieces] = useState<Piece[]>(initialBoardState);
   const [turn, setTurn] = useState<TeamType>(TeamType.WHITE);
+  const [castlingPieceMoveHistory, setCastlingPieceMoveHistory] =
+    useState<castlingPieceMoveHistory>(initialCastlingState);
   //const [moveHistory, setMoveHistory] = useState<string[]>([]);
   const chessboardRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  function initialBoard(initialBoardState: Piece[]) {
+    let board: JSX.Element[] = [];
+    for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
+      for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
+        const number = j + i + 2;
+        const piece = pieces.find((p) =>
+          samePosition(p.position, { x: i, y: j })
+        );
+        let image = piece ? piece.image : undefined;
+
+        board.push(<Tile key={`${j},${i}`} image={image} number={number} />);
+      }
+    }
+    return board;
+  }
+  var [board, setBoard] = useState<JSX.Element[]>(initialBoard(pieces));
+  useEffect(() => {
+    setBoard(initialBoard(pieces));
+  }, [pieces]);
   function handleEvent(e: React.MouseEvent) {
     const element = e.target as HTMLElement;
     const chessboard = chessboardRef.current;
@@ -52,7 +73,9 @@ export default function Chessboard({}) {
         turn,
         setTurn,
         activePiece,
-        setActivePiece
+        setActivePiece,
+        castlingPieceMoveHistory,
+        setCastlingPieceMoveHistory
       );
     }
   }
@@ -98,19 +121,6 @@ export default function Chessboard({}) {
 
   function promotionTeamType() {
     return promotionPawn?.team === TeamType.WHITE ? "w" : "b";
-  }
-  let board = [];
-  console.log("running once");
-  for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
-    for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
-      const number = j + i + 2;
-      const piece = pieces.find((p) =>
-        samePosition(p.position, { x: i, y: j })
-      );
-      let image = piece ? piece.image : undefined;
-
-      board.push(<Tile key={`${j},${i}`} image={image} number={number} />);
-    }
   }
   return (
     <>
