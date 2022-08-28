@@ -31,12 +31,11 @@ export const queenMove = (
     };
 
     if (samePosition(passedPosition, desiredPosition)) {
+      if (isTileOccupied(passedPosition, boardState, team)) {
+        break;
+      }
       if (tileIsEmptyOrOccupiedByOpponent(passedPosition, boardState, team)) {
         return true;
-      }
-    } else {
-      if (isTileOccupied(passedPosition, boardState)) {
-        break;
       }
     }
   }

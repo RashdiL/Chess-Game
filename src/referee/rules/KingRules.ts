@@ -1,5 +1,4 @@
 import { Piece, Position, samePosition, TeamType } from "../../Constants";
-import { isKingInCheck } from "./Check";
 import {
   tileIsEmptyOrOccupiedByOpponent,
   isTileOccupied,
@@ -10,20 +9,9 @@ export const kingMove = (
   initialPosition: Position,
   desiredPosition: Position,
   team: TeamType,
-  boardState: Piece[],
-  didKingMove: boolean,
-  didKingsRookMove: boolean,
-  didQueensRookMove: boolean
+  boardState: Piece[]
 ): boolean => {
   let oppositeTeam = team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
-  //Check if we are trying to castle
-  let castlingY = team === TeamType.WHITE ? 0 : 7;
-  let castlingXKingSide = 6;
-  let castlingXQueenSide = 2;
-  let kingSideCastlePosition: Position = { x: 6, y: castlingY };
-  let queenSideCastlePosition: Position = { x: 2, y: castlingY };
-  if (desiredPosition === kingSideCastlePosition) {
-  }
   for (let i = 1; i < 2; i++) {
     //Diagonal
     let multiplierX =
@@ -45,28 +33,17 @@ export const kingMove = (
     };
 
     if (samePosition(passedPosition, desiredPosition)) {
+      if (isTileOccupied(passedPosition, boardState, team)) {
+        break;
+      }
       if (
         tileIsEmptyOrOccupiedByOpponent(passedPosition, boardState, team) &&
         !isTileControlledByAPiece(desiredPosition, boardState, oppositeTeam)
       ) {
         return true;
       }
-    } else {
-      if (isTileOccupied(passedPosition, boardState)) {
-        break;
-      }
     }
   }
 
-  return false;
-};
-
-export const doesKingHaveToMove = (
-  boardState: Piece[],
-  team: TeamType
-): boolean => {
-  const oppositeTeam =
-    team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
-  if (isKingInCheck(boardState, oppositeTeam)) return true;
   return false;
 };

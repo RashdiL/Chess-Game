@@ -13,7 +13,7 @@ import {
 } from "./Check";
 import { isTileControlledByAPiece, isTileOccupied } from "./GeneralRules";
 
-export const canKingMove = (boardState: Piece[], team: TeamType) => {
+export const canEnemyKingMove = (boardState: Piece[], team: TeamType) => {
   const king = boardState.find((p) => {
     if (p.type === PieceType.KING && p.team !== team) {
       return p;
@@ -170,7 +170,7 @@ export const isGameOver = (boardState: Piece[], team: TeamType) => {
     }
     return false;
   });
-  if (!isKingInCheck(boardState, team) || canKingMove(boardState, team)) {
+  if (!isKingInCheck(boardState, team) || canEnemyKingMove(boardState, team)) {
     return result;
   }
   let pieceChecking = getPieceGivingCheck(boardState, team);
@@ -186,6 +186,5 @@ export const isGameOver = (boardState: Piece[], team: TeamType) => {
     return result;
   }
   result = true;
-  console.log("that's game");
   return result;
 };

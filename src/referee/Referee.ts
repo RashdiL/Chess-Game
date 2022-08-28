@@ -5,6 +5,9 @@ import {
   Position,
   VERTICAL_AXIS,
   HORIZONTAL_AXIS,
+  samePosition,
+  setBoard,
+  castlingPieceMoveHistory,
 } from "../Constants";
 
 import {
@@ -14,9 +17,12 @@ import {
   rookMove,
   queenMove,
   kingMove,
-  doesKingHaveToMove,
 } from "./rules";
 import { isKingInCheck } from "./rules/Check";
+import {
+  findPieceInSpecificPosition,
+  isTileControlledByAPiece,
+} from "./rules/GeneralRules";
 
 export default class Referee {
   isEnPassantMove(
@@ -61,26 +67,105 @@ export default class Referee {
   //Add check!
   //Add checkmate!
   //Add stalemate!
+  isValidCastle(
+    initialPosition: Position,
+    desiredPosition: Position,
+    type: PieceType,
+    team: TeamType,
+    boardState: Piece[],
+    castlingPieceMoveHistory: castlingPieceMoveHistory
+  ) {
+    let oppositeTeam =
+      team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
+    //Check if we are trying to castle
+    let castlingY = team === TeamType.WHITE ? 0 : 7;
+    let kingSideCastlePosition: Position = { x: 6, y: castlingY };
+    let queenSideCastlePosition: Position = { x: 2, y: castlingY };
+    if (samePosition(desiredPosition, kingSideCastlePosition)) {
+      if (isKingInCheck(boardState, team)) return false;
+      if (
+        findPieceInSpecificPosition(boardState, { x: 5, y: castlingY }) ||
+        findPieceInSpecificPosition(boardState, kingSideCastlePosition)
+      ) {
+        return false;
+      }
+      if (team === TeamType.WHITE) {
+        if (castlingPieceMoveHistory.didWhiteKingMove) return false;
+        if (castlingPieceMoveHistory.didWKingRookMove) return false;
+      } else {
+        if (castlingPieceMoveHistory.didBlackKingMove) return false;
+        if (castlingPieceMoveHistory.didBKingRookMove) return false;
+      }
+      if (
+        isTileControlledByAPiece(
+          { x: 5, y: castlingY },
+          boardState,
+          oppositeTeam
+        ) ||
+        isTileControlledByAPiece(
+          kingSideCastlePosition,
+          boardState,
+          oppositeTeam
+        )
+      ) {
+        return false;
+      }
+    }
+    if (samePosition(desiredPosition, queenSideCastlePosition)) {
+      if (isKingInCheck(boardState, team)) return false;
+      if (
+        findPieceInSpecificPosition(boardState, { x: 1, y: castlingY }) ||
+        findPieceInSpecificPosition(boardState, queenSideCastlePosition) ||
+        findPieceInSpecificPosition(boardState, { x: 3, y: castlingY })
+      ) {
+        return false;
+      }
+      if (team === TeamType.WHITE) {
+        if (castlingPieceMoveHistory.didWhiteKingMove) return false;
+        if (castlingPieceMoveHistory.didWQueenRookMove) return false;
+      } else {
+        if (castlingPieceMoveHistory.didBlackKingMove) return false;
+        if (castlingPieceMoveHistory.didBQueenRookMove) return false;
+      }
+      if (
+        isTileControlledByAPiece(
+          { x: 1, y: castlingY },
+          boardState,
+          oppositeTeam
+        ) ||
+        isTileControlledByAPiece(
+          queenSideCastlePosition,
+          boardState,
+          oppositeTeam
+        ) ||
+        isTileControlledByAPiece(
+          { x: 3, y: castlingY },
+          boardState,
+          oppositeTeam
+        )
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
   isValidMove(
     initialPosition: Position,
     desiredPosition: Position,
     type: PieceType,
     team: TeamType,
     boardState: Piece[],
-    potentialBoardState: Piece[],
-    didKingMove: boolean,
-    didKingsRookMove: boolean,
-    didQueensRookMove: boolean
+    castlingPieceMoveHistory: castlingPieceMoveHistory
   ) {
     let validMove = false;
     const oppositeTeam =
       team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
+    let potentialBoardState = setBoard(
+      boardState,
+      initialPosition,
+      desiredPosition
+    );
     if (isKingInCheck(potentialBoardState, oppositeTeam)) return false;
-    if (doesKingHaveToMove(boardState, team)) {
-      if (type !== PieceType.KING) {
-        return false;
-      }
-    }
     switch (type) {
       case PieceType.PAWN:
         validMove = pawnMove(
@@ -127,10 +212,7 @@ export default class Referee {
           initialPosition,
           desiredPosition,
           team,
-          boardState,
-          didKingMove,
-          didKingsRookMove,
-          didQueensRookMove
+          boardState
         );
     }
 

@@ -19,12 +19,11 @@ export const rookMove = (
         y: initialPosition.y + i * multiplier,
       };
       if (samePosition(passedPosition, desiredPosition)) {
+        if (isTileOccupied(passedPosition, boardState, team)) {
+          break;
+        }
         if (tileIsEmptyOrOccupiedByOpponent(passedPosition, boardState, team)) {
           return true;
-        }
-      } else {
-        if (isTileOccupied(passedPosition, boardState)) {
-          break;
         }
       }
     }
@@ -39,57 +38,14 @@ export const rookMove = (
         y: initialPosition.y,
       };
       if (samePosition(passedPosition, desiredPosition)) {
+        if (isTileOccupied(passedPosition, boardState, team)) {
+          break;
+        }
         if (tileIsEmptyOrOccupiedByOpponent(passedPosition, boardState, team)) {
           return true;
-        }
-      } else {
-        if (isTileOccupied(passedPosition, boardState)) {
-          break;
         }
       }
     }
   }
   return false;
-};
-
-export const rookControls = (
-  currentPosition: Position,
-  boardState: Piece[]
-) => {
-  let tilesControlled = [];
-  //vertically
-  for (let j = -1; j < 2; j = j + 2) {
-    for (let i = 1; i < 8; i++) {
-      let controlledPosition: Position = {
-        x: currentPosition.x,
-        y: currentPosition.y + i * j,
-      };
-      if (
-        isTileOccupied(controlledPosition, boardState) ||
-        controlledPosition.y < 0 ||
-        controlledPosition.y > 7
-      ) {
-        break;
-      }
-      tilesControlled.push(controlledPosition);
-    }
-  }
-  //horizontally
-  for (let j = -1; j < 2; j = j + 2) {
-    for (let i = 1; i < 8; i++) {
-      let controlledPosition: Position = {
-        x: currentPosition.x + i * j,
-        y: currentPosition.y,
-      };
-      if (
-        isTileOccupied(controlledPosition, boardState) ||
-        controlledPosition.x < 0 ||
-        controlledPosition.x > 7
-      ) {
-        break;
-      }
-      tilesControlled.push(controlledPosition);
-    }
-  }
-  return tilesControlled;
 };
