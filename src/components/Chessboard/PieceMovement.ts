@@ -213,6 +213,7 @@ export function dropPiece(
     currentPiece.team,
     pieces
   );
+  console.log(isEnPassantMove);
 
   const validMove = referee.isValidMove(
     grabPosition,
@@ -222,17 +223,40 @@ export function dropPiece(
     pieces,
     castlingPieceMoveHistory
   );
+  const pawnDirection = currentPiece.team === TeamType.WHITE ? 1 : -1;
 
-  if (validMove && currentPiece.team === turn) {
+  if (isEnPassantMove && currentPiece.team === turn) {
+    const updatedPieces = pieces.reduce((results, piece) => {
+      if (samePosition(piece.position, grabPosition)) {
+        piece.enPassant = false;
+        piece.position.x = x;
+        piece.position.y = y;
+        results.push(piece);
+      } else if (!samePosition(piece.position, { x, y: y - pawnDirection })) {
+        if (piece.type === PieceType.PAWN) {
+          piece.enPassant = false;
+        }
+        results.push(piece);
+      }
+
+      return results;
+    }, [] as Piece[]);
+
+    setPieces(updatedPieces);
+  } else if (validMove && currentPiece.team === turn) {
     let promotionRow = currentPiece.team === TeamType.WHITE ? 7 : 0;
     adjustPieceMoveHistory(castlingPieceMoveHistory, currentPiece);
     const updatedPieces = pieces.reduce((results, piece) => {
       if (samePosition(piece.position, grabPosition)) {
-        piece.position = desiredPosition;
-        if (y === promotionRow && piece.type === PieceType.PAWN) {
-          modalRef.current?.classList.remove("hidden");
-          setPromotionPawn(piece);
+        if (piece.type === PieceType.PAWN) {
+          if (desiredPosition.y === promotionRow) {
+            modalRef.current?.classList.remove("hidden");
+            setPromotionPawn(piece);
+          } else if (Math.abs(desiredPosition.y - grabPosition.y) === 2) {
+            piece.enPassant = true;
+          }
         }
+        piece.position = desiredPosition;
         results.push(piece);
       } else if (!samePosition(piece.position, desiredPosition)) {
         if (piece.type === PieceType.PAWN) {
