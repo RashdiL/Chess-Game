@@ -206,6 +206,14 @@ export function dropPiece(
       return;
     }
   }
+  const isEnPassantMove = referee.isEnPassantMove(
+    grabPosition,
+    desiredPosition,
+    currentPiece.type,
+    currentPiece.team,
+    pieces
+  );
+
   const validMove = referee.isValidMove(
     grabPosition,
     desiredPosition,
