@@ -81,6 +81,7 @@ export function grabPiece(e: React.MouseEvent, chessboard: HTMLDivElement) {
   element.style.top = `${y}px`;
   return [{ x: grabX, y: grabY }, element];
 }
+
 const referee = new Referee();
 export function movePiece(
   e: React.MouseEvent,
@@ -121,6 +122,7 @@ export function movePiece(
     activePiece.style.top = `${y}px`;
   }
 }
+
 export function dropPiece(
   e: React.MouseEvent,
   chessboard: HTMLDivElement,

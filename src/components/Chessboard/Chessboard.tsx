@@ -27,7 +27,8 @@ export default function Chessboard() {
     useState<castlingPieceMoveHistory>(initialCastlingState);
   const chessboardRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-  function initialBoard(initialBoardState: Piece[]) {
+
+  function createBoard(initialBoardState: Piece[]) {
     let board: JSX.Element[] = [];
     for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
       for (let i = 0; i < HORIZONTAL_AXIS.length; i++) {
@@ -42,10 +43,12 @@ export default function Chessboard() {
     }
     return board;
   }
-  var [board, setBoard] = useState<JSX.Element[]>(initialBoard(pieces));
+
+  var [board, setBoard] = useState<JSX.Element[]>(createBoard(pieces));
   useEffect(() => {
-    setBoard(initialBoard(pieces));
+    setBoard(createBoard(pieces));
   }, [pieces]);
+
   function handleEvent(e: React.MouseEvent) {
     const element = e.target as HTMLElement;
     const chessboard = chessboardRef.current;
