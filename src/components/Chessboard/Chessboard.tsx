@@ -9,15 +9,10 @@ import {
   Position,
   samePosition,
   initialBoardStateForTesting,
-<<<<<<< HEAD
-  initialBoardState,
-  //initialBoardState,
-=======
   castlingPieceMoveHistory,
   initialCastlingState,
   VERTICAL_AXIS,
   HORIZONTAL_AXIS,
->>>>>>> cleaningCode
 } from "../../Constants";
 import { grabPiece, movePiece, dropPiece } from "./PieceMovement";
 import Tile from "../Tile/Tile";
