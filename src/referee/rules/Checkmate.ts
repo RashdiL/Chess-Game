@@ -174,10 +174,8 @@ export const isGameOver = (boardState: Piece[], team: TeamType) => {
     return result;
   }
   let pieceChecking = getPieceGivingCheck(boardState, team);
-  if (!pieceChecking || !king) return result;
-  if (canPieceGetCaptured(boardState, team, pieceChecking)) {
-  }
-  if (canCheckGetBlocked(boardState, team)) {
+  if (!pieceChecking || !king) {
+    return result;
   }
   if (
     canPieceGetCaptured(boardState, team, pieceChecking) ||
@@ -186,5 +184,8 @@ export const isGameOver = (boardState: Piece[], team: TeamType) => {
     return result;
   }
   result = true;
+  if (result) {
+    console.log("THAT IS GAME");
+  }
   return result;
 };

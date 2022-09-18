@@ -1,7 +1,9 @@
 import {
   castlingPieceMoveHistory,
   GRID_SIZE,
+  initialBoardState,
   isPlayerTryingToCastle,
+  moveHistory,
   Piece,
   PieceType,
   Position,
@@ -11,8 +13,10 @@ import {
 import Referee from "../../referee/Referee";
 import { isKingInCheck } from "../../referee/rules/Check";
 import { isGameOver } from "../../referee/rules/Checkmate";
+import { findPieceInSpecificPosition } from "../../referee/rules/GeneralRules";
 import { isItStalemate } from "../../referee/rules/Stalemate";
 import { tilesControlled } from "../../referee/rules/tilesControlled";
+import { generateAnnotation } from "./UtilityFunctions";
 
 export function adjustPieceMoveHistory(
   castlingPieceMoveHistory: castlingPieceMoveHistory,
@@ -138,7 +142,12 @@ export function dropPiece(
     React.SetStateAction<castlingPieceMoveHistory>
   >,
   setPromotionPawn: React.Dispatch<React.SetStateAction<Piece | undefined>>,
-  modalRef: React.RefObject<HTMLDivElement>
+  modalRef: React.RefObject<HTMLDivElement>,
+  gameStatus: React.RefObject<HTMLDivElement>,
+  moveHistory: moveHistory[],
+  setMoveHistory: React.Dispatch<React.SetStateAction<moveHistory[]>>,
+  deadPieces: Piece[] | null,
+  setDeadPieces: React.Dispatch<React.SetStateAction<Piece[] | null>>
 ) {
   //the x and y coords below are the coords of where you are trying to drop your piece.
   const x = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
@@ -198,6 +207,7 @@ export function dropPiece(
           p.team
         );
       });
+      //setMoveHistory([...moveHistory, "Castled"]);
       isKingInCheck(updatedPieces, turn);
       isGameOver(updatedPieces, currentPiece.team);
       if (turn === TeamType.WHITE) {
@@ -246,8 +256,36 @@ export function dropPiece(
 
     setPieces(updatedPieces);
   } else if (validMove && currentPiece.team === turn) {
+    const move = generateAnnotation(currentPiece, desiredPosition, pieces);
+    if (move) {
+      const newMove = {
+        piece: currentPiece,
+        prevPosition: currentPiece.position,
+        newPosition: desiredPosition,
+        newAnnotatedPosition: move,
+      };
+      setMoveHistory([...moveHistory, newMove]);
+    }
     let promotionRow = currentPiece.team === TeamType.WHITE ? 7 : 0;
     adjustPieceMoveHistory(castlingPieceMoveHistory, currentPiece);
+    const opposite_team =
+      currentPiece.team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
+    //Lets see if an enemy piece exists in the position we want to move to.
+    const enemy_piece = findPieceInSpecificPosition(
+      pieces,
+      desiredPosition,
+      opposite_team
+    );
+    if (enemy_piece) {
+      let newEnemyPieces: Piece[] | null = [];
+      if (deadPieces) {
+        newEnemyPieces = [...deadPieces, enemy_piece];
+      } else {
+        newEnemyPieces = [enemy_piece];
+      }
+      setDeadPieces(newEnemyPieces);
+      console.log(newEnemyPieces);
+    }
     const updatedPieces = pieces.reduce((results, piece) => {
       if (samePosition(piece.position, grabPosition)) {
         if (piece.type === PieceType.PAWN) {
@@ -280,6 +318,10 @@ export function dropPiece(
     });
     isKingInCheck(updatedPieces, turn);
     isGameOver(updatedPieces, currentPiece.team);
+    if (isGameOver(updatedPieces, currentPiece.team)) {
+      console.log("GAME OVER");
+      gameStatus.current?.classList.remove("hidden");
+    }
     let enemy =
       currentPiece.team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
     isItStalemate(updatedPieces, enemy);

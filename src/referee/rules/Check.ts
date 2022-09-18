@@ -56,7 +56,10 @@ export function isCheckHorizontalVerticalOrDiagonal(
 }
 
 export const canCheckGetBlocked = (boardState: Piece[], team: TeamType) => {
-  if (!isKingInCheck(boardState, team)) return false;
+  if (!isKingInCheck(boardState, team)) {
+    console.log("1");
+    return false;
+  }
   const checkDirection = isCheckHorizontalVerticalOrDiagonal(boardState, team);
   const piece = getPieceGivingCheck(boardState, team);
   const king = boardState.find((p) => {
@@ -85,17 +88,20 @@ export const canCheckGetBlocked = (boardState: Piece[], team: TeamType) => {
         );
         if (!piecesControllingTheSquare) return false;
         if (piecesControllingTheSquare.length > 1) {
+          console.log("2");
           return true;
         }
         const doesKingControlTheSquare = piecesControllingTheSquare.find(
           (p) => {
             if (p.type === PieceType.KING) {
+              console.log("3");
               return true;
             }
             return false;
           }
         );
         if (!doesKingControlTheSquare) {
+          console.log("4");
           return true;
         }
         const doesCheckingTeamControlTheSquare = findPieceControllingThisSquare(
@@ -106,6 +112,7 @@ export const canCheckGetBlocked = (boardState: Piece[], team: TeamType) => {
         if (doesCheckingTeamControlTheSquare) {
           return false;
         } else {
+          console.log("5");
           return true;
         }
       }
@@ -129,6 +136,7 @@ export const canCheckGetBlocked = (boardState: Piece[], team: TeamType) => {
         );
         if (piecesControllingTheSquare.length === 0) return false;
         if (piecesControllingTheSquare.length > 1) {
+          console.log("6");
           return true;
         }
         const doesKingControlTheSquare = piecesControllingTheSquare.find(
@@ -140,6 +148,7 @@ export const canCheckGetBlocked = (boardState: Piece[], team: TeamType) => {
           }
         );
         if (!doesKingControlTheSquare) {
+          console.log("7");
           return true;
         }
         const doesCheckingTeamControlTheSquare = findPieceControllingThisSquare(
@@ -150,6 +159,7 @@ export const canCheckGetBlocked = (boardState: Piece[], team: TeamType) => {
         if (doesCheckingTeamControlTheSquare) {
           return false;
         } else {
+          console.log("8");
           return true;
         }
       }
@@ -167,6 +177,8 @@ export const canCheckGetBlocked = (boardState: Piece[], team: TeamType) => {
           x: piece.position.x + i * Xmultiplier,
           y: piece.position.y + i * Ymultiplier,
         };
+        console.log(checkingPosition.x);
+        console.log(checkingPosition.y);
         const piecesControllingTheSquare = findPiecesControllingThisSquare(
           boardState,
           king.team,
@@ -185,6 +197,7 @@ export const canCheckGetBlocked = (boardState: Piece[], team: TeamType) => {
           }
         );
         if (!doesKingControlTheSquare) {
+          //piecesControllingTheSquare.forEach();
           return true;
         }
         const doesCheckingTeamControlTheSquare = findPieceControllingThisSquare(

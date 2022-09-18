@@ -1,10 +1,9 @@
 import "./App.css";
-import Chessboard from "./components/Chessboard/Chessboard";
-
+import Trainer from "./components/Trainer/Trainer";
 function App() {
   return (
     <div id="app">
-      <Chessboard />
+      <Trainer />
     </div>
   );
 }

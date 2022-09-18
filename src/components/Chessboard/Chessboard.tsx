@@ -8,16 +8,24 @@ import {
   initialBoardState,
   Position,
   samePosition,
-  initialBoardStateForTesting,
   castlingPieceMoveHistory,
   initialCastlingState,
   VERTICAL_AXIS,
   HORIZONTAL_AXIS,
+  moveHistory,
 } from "../../Constants";
 import { grabPiece, movePiece, dropPiece } from "./PieceMovement";
 import Tile from "../Tile/Tile";
-
-export default function Chessboard() {
+type Props = {
+  moveHistory: moveHistory[];
+  setMoveHistory: React.Dispatch<React.SetStateAction<moveHistory[]>>;
+  undoMove: moveHistory | undefined;
+};
+const Chessboard: React.FC<Props> = ({
+  moveHistory,
+  setMoveHistory,
+  undoMove,
+}) => {
   const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
   const [promotionPawn, setPromotionPawn] = useState<Piece>();
   const [grabPosition, setGrabPosition] = useState<Position>({ x: -1, y: -1 });
@@ -27,7 +35,8 @@ export default function Chessboard() {
     useState<castlingPieceMoveHistory>(initialCastlingState);
   const chessboardRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-
+  const gameStatus = useRef<HTMLDivElement>(null);
+  const [deadPieces, setDeadPieces] = useState<Piece[] | null>(null);
   function createBoard(initialBoardState: Piece[]) {
     let board: JSX.Element[] = [];
     for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
@@ -45,8 +54,10 @@ export default function Chessboard() {
   }
 
   var [board, setBoard] = useState<JSX.Element[]>(createBoard(pieces));
+
   useEffect(() => {
     setBoard(createBoard(pieces));
+    gameStatus.current?.classList.add("hidden");
   }, [pieces]);
 
   function handleEvent(e: React.MouseEvent) {
@@ -79,7 +90,12 @@ export default function Chessboard() {
         castlingPieceMoveHistory,
         setCastlingPieceMoveHistory,
         setPromotionPawn,
-        modalRef
+        modalRef,
+        gameStatus,
+        moveHistory,
+        setMoveHistory,
+        deadPieces,
+        setDeadPieces
       );
     }
   }
@@ -152,6 +168,9 @@ export default function Chessboard() {
           />
         </div>
       </div>
+      <div id="checkmate" ref={gameStatus}>
+        <h1>GAME OVER</h1>
+      </div>
       <div
         onMouseMove={(e) => handleEvent(e)}
         onMouseDown={(e) => handleEvent(e)}
@@ -163,4 +182,5 @@ export default function Chessboard() {
       </div>
     </>
   );
-}
+};
+export default Chessboard;
