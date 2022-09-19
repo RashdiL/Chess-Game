@@ -8,6 +8,8 @@ import {
   samePosition,
   setBoard,
   castlingPieceMoveHistory,
+  GRID_SIZE,
+  isPlayerTryingToCastle,
 } from "../Constants";
 
 import {
@@ -55,18 +57,6 @@ export default class Referee {
     return false;
   }
 
-  NewMove(desiredPosition: Position, type: PieceType) {
-    const NewPos = `${HORIZONTAL_AXIS[desiredPosition.x]}${
-      VERTICAL_AXIS[desiredPosition.y]
-    }`;
-    return NewPos;
-  }
-  //TODO
-  //Prevent the king from moving into danger!
-  //Add castling!
-  //Add check!
-  //Add checkmate!
-  //Add stalemate!
   isValidCastle(
     initialPosition: Position,
     desiredPosition: Position,
@@ -149,24 +139,57 @@ export default class Referee {
     }
     return true;
   }
+
   isValidMove(
-    initialPosition: Position,
     desiredPosition: Position,
-    type: PieceType,
-    team: TeamType,
+    initialPosition: Position,
     boardState: Piece[],
-    castlingPieceMoveHistory: castlingPieceMoveHistory
+    castlingPieceMoveHistory: castlingPieceMoveHistory,
+    turn: TeamType
   ) {
     let validMove = false;
+    let isCastling = false;
+    let enPassanting = false;
+    let moveSummary = [validMove, isCastling, enPassanting];
+    const currentPiece = boardState.find((p) =>
+      samePosition(p.position, initialPosition)
+    );
+    if (!currentPiece) return moveSummary;
+    let team = currentPiece.team;
+    if (!(team === turn)) return moveSummary;
     const oppositeTeam =
-      team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
+      currentPiece.team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
     let potentialBoardState = setBoard(
       boardState,
       initialPosition,
       desiredPosition
     );
-    if (isKingInCheck(potentialBoardState, oppositeTeam)) return false;
-    switch (type) {
+    if (
+      isPlayerTryingToCastle(currentPiece, desiredPosition, currentPiece.team)
+    ) {
+      const validCastle = this.isValidCastle(
+        initialPosition,
+        desiredPosition,
+        currentPiece.type,
+        currentPiece.team,
+        boardState,
+        castlingPieceMoveHistory
+      );
+      if (!validCastle) return moveSummary;
+      return [true, true, false];
+    }
+    const isEnPassantMove = this.isEnPassantMove(
+      initialPosition,
+      desiredPosition,
+      currentPiece.type,
+      currentPiece.team,
+      boardState
+    );
+    if (isEnPassantMove) {
+      return [true, false, true];
+    }
+    if (isKingInCheck(potentialBoardState, oppositeTeam)) return moveSummary;
+    switch (currentPiece.type) {
       case PieceType.PAWN:
         validMove = pawnMove(
           initialPosition,
@@ -215,7 +238,6 @@ export default class Referee {
           boardState
         );
     }
-
-    return validMove;
+    return [validMove, false, false];
   }
 }

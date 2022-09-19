@@ -3,16 +3,11 @@ import MoveTracker from "../MoveTracker/MoveTracker";
 import "./Trainer.css";
 import { useState } from "react";
 import { moveHistory } from "../../Constants";
+import OpeningTester from "../OpeningTester/OpeningTester";
 export default function Trainer() {
   const [moveHistory, setMoveHistory] = useState<moveHistory[]>([]);
-  const [undoMove, setUndoMove] = useState<moveHistory | undefined>();
-  function handleClick(e: React.MouseEvent) {
-    const newMoveHistory = [...moveHistory];
-    const removed_move = newMoveHistory.pop();
-    setUndoMove(removed_move);
-    console.log("undo");
-    setMoveHistory(newMoveHistory);
-  }
+  const [undoMove, setUndoMove] = useState<boolean>(false);
+  const [resetBoard, setResetBoard] = useState<boolean>(false);
   return (
     <>
       <div className="parent">
@@ -21,19 +16,19 @@ export default function Trainer() {
             moveHistory={moveHistory}
             setMoveHistory={setMoveHistory}
             undoMove={undoMove}
+            resetBoard={resetBoard}
+            setResetBoard={setResetBoard}
           />
         </div>
         <div className="child">
           <MoveTracker moveHistory={moveHistory} />
         </div>
-        <button
-          className="button"
-          onClick={(e) => {
-            handleClick(e);
-          }}
-        >
-          Undo
-        </button>
+        <OpeningTester
+          moveHistory={moveHistory}
+          setMoveHistory={setMoveHistory}
+          resetBoard={resetBoard}
+          setResetBoard={setResetBoard}
+        />
       </div>
     </>
   );
