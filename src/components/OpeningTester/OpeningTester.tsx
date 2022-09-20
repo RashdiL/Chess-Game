@@ -1,22 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { moveHistory } from "../../Constants";
+import "./OpeningTester.css";
 type Props = {
   moveHistory: moveHistory[] | undefined;
   setMoveHistory: React.Dispatch<React.SetStateAction<moveHistory[]>>;
-  resetBoard: boolean;
   setResetBoard: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const OpeningTester: React.FC<Props> = ({
   moveHistory,
   setMoveHistory,
-  resetBoard,
   setResetBoard,
 }) => {
   const [testingOpening, setTestingOpening] = useState<
     moveHistory[] | undefined
   >();
   const [testingMode, setTestingMode] = useState<boolean>(false);
-
+  const isMoveCorrect = useRef<HTMLDivElement>(null);
+  const isMoveWrong = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (testingMode && moveHistory && testingOpening) {
       testingMoves(moveHistory, testingOpening);
@@ -32,7 +32,14 @@ const OpeningTester: React.FC<Props> = ({
         testingOpening[i].newAnnotatedPosition
       ) {
         console.log("CORRECT");
+        if (isMoveCorrect.current) {
+          isMoveCorrect.current.style.display = "inline";
+        }
       } else {
+        if (isMoveWrong.current && isMoveCorrect.current) {
+          isMoveCorrect.current.style.display = "none";
+          isMoveWrong.current.style.display = "inline";
+        }
         console.log("FALSE");
       }
     }
@@ -46,13 +53,23 @@ const OpeningTester: React.FC<Props> = ({
     console.log(testingOpening);
   }
   return (
-    <button
-      onClick={() => {
-        saveOpening();
-      }}
-    >
-      Click here to save your moves.
-    </button>
+    <div className="button">
+      <button
+        onClick={() => {
+          saveOpening();
+        }}
+      >
+        Click here to save your moves.
+      </button>
+      <div className="moveResult">
+        <h1 className="wrongMove" ref={isMoveWrong}>
+          WRONG
+        </h1>
+        <h1 className="rightMove" ref={isMoveCorrect}>
+          RIGHT
+        </h1>
+      </div>
+    </div>
   );
 };
 export default OpeningTester;

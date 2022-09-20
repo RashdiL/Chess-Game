@@ -40,7 +40,9 @@ const Chessboard: React.FC<Props> = ({
   );
   const [turn, setTurn] = useState<TeamType>(TeamType.WHITE);
   const [castlingPieceMoveHistory, setCastlingPieceMoveHistory] =
-    useState<castlingPieceMoveHistory>(initialCastlingState);
+    useState<castlingPieceMoveHistory>(
+      JSON.parse(JSON.stringify(initialCastlingState))
+    );
   const chessboardRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const gameStatus = useRef<HTMLDivElement>(null);
@@ -65,8 +67,10 @@ const Chessboard: React.FC<Props> = ({
 
   useEffect(() => {
     if (resetBoard) {
-      setPieces(initialBoardState);
-      console.log("reseting");
+      setPieces(JSON.parse(JSON.stringify(initialBoardState)));
+      setCastlingPieceMoveHistory(
+        JSON.parse(JSON.stringify(initialCastlingState))
+      );
       setResetBoard(false);
       setTurn(TeamType.WHITE);
     }
@@ -76,7 +80,8 @@ const Chessboard: React.FC<Props> = ({
     setBoard(createBoard(pieces));
     gameStatus.current?.classList.add("hidden");
   }, [pieces]);
-  function handleEvent(e: React.MouseEvent) {
+
+  function handlePieceMovement(e: React.MouseEvent) {
     const element = e.target as HTMLElement;
     const chessboard = chessboardRef.current;
     if (!element.classList.contains("chess-piece") || !chessboard) return;
@@ -106,6 +111,8 @@ const Chessboard: React.FC<Props> = ({
         castlingPieceMoveHistory,
         turn
       );
+      //if the move is valid. validMove[1] is a boolean stating if the player is trying to castle.
+      //validMove[2] states if the player is trying to enPassent.
       if (validMove[0]) {
         updateBoard(
           validMove,
@@ -179,8 +186,11 @@ const Chessboard: React.FC<Props> = ({
   function promotionTeamType() {
     return promotionPawn?.team === TeamType.WHITE ? "w" : "b";
   }
+
   function handleUndo() {
-    const lastMove = moveHistory.pop();
+    const newMoveHistory = JSON.parse(JSON.stringify(moveHistory));
+    const lastMove = newMoveHistory.pop();
+    setMoveHistory(newMoveHistory);
     if (!lastMove) return;
     updateBoard(
       [true, false, false],
@@ -205,16 +215,6 @@ const Chessboard: React.FC<Props> = ({
   }
   return (
     <>
-      <div>
-        <p>Click to undo button</p>
-        <button
-          onClick={() => {
-            handleUndo();
-          }}
-        >
-          Click here
-        </button>
-      </div>
       <div id="pawn-promotion-modal" className="hidden" ref={modalRef}>
         <div className="modal-body">
           <img
@@ -242,14 +242,28 @@ const Chessboard: React.FC<Props> = ({
       <div id="checkmate" ref={gameStatus}>
         <h1>GAME OVER</h1>
       </div>
-      <div
-        onMouseMove={(e) => handleEvent(e)}
-        onMouseDown={(e) => handleEvent(e)}
-        onMouseUp={(e) => handleEvent(e)}
-        id="chessboard"
-        ref={chessboardRef}
-      >
-        {board}
+      <div className="boardAndButton">
+        <div className="chessboard-container">
+          <div
+            onMouseMove={(e) => handlePieceMovement(e)}
+            onMouseDown={(e) => handlePieceMovement(e)}
+            onMouseUp={(e) => handlePieceMovement(e)}
+            id="chessboard"
+            ref={chessboardRef}
+          >
+            {board}
+          </div>
+        </div>
+        <div className="button-container">
+          <p>Click to undo button</p>
+          <button
+            onClick={() => {
+              handleUndo();
+            }}
+          >
+            Click here
+          </button>
+        </div>
       </div>
     </>
   );

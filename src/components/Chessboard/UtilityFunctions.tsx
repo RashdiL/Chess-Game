@@ -33,11 +33,18 @@ export const initialBoard = (initialBoardState: Piece[]) => {
 export const generateAnnotation = (
   currentPiece: Piece,
   desiredPosition: Position,
-  boardState: Piece[]
+  boardState: Piece[],
+  isCastling: boolean
 ) => {
   //account for castling, eating pieces, regular movement, and movement that can be made by two of the same pieces.
   const opposite_team =
     currentPiece.team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
+
+  if (isCastling) {
+    if (currentPiece.position.x < desiredPosition.x) {
+      return `O-O`;
+    } else return `O-O-O`;
+  }
   //Lets see if an enemy piece exists in the position we want to move to.
   const enemy_piece = findPieceInSpecificPosition(
     boardState,
@@ -45,12 +52,22 @@ export const generateAnnotation = (
     opposite_team
   );
   const pieceSymbols = ["", "B", "N", "R", "Q", "K"];
+  const desired_x = desiredPosition.x;
+  const desired_y = desiredPosition.y;
   if (!enemy_piece) {
-    const desired_x = desiredPosition.x;
-    const desired_y = desiredPosition.y;
     return `${pieceSymbols[currentPiece.type]}${HORIZONTAL_AXIS[desired_x]}${
       desired_y + 1
     }`;
+  } else {
+    if (currentPiece.type === PieceType.PAWN) {
+      return `${HORIZONTAL_AXIS[currentPiece.position.x]}x${
+        HORIZONTAL_AXIS[desired_x]
+      }${desired_y + 1}`;
+    } else {
+      return `${pieceSymbols[currentPiece.type]}x${HORIZONTAL_AXIS[desired_x]}${
+        desired_y + 1
+      }`;
+    }
   }
 };
 
@@ -128,6 +145,21 @@ export function updateBoard(
   if (!currentPiece) return false;
   //Is the player trying to castle?
   if (validMove[1] === true) {
+    const castling_move = generateAnnotation(
+      currentPiece,
+      desiredPosition,
+      pieces,
+      true
+    );
+    if (castling_move) {
+      const newMove = {
+        piece: currentPiece,
+        prevPosition: currentPiece.position,
+        newPosition: desiredPosition,
+        newAnnotatedPosition: castling_move,
+      };
+      setMoveHistory([...moveHistory, newMove]);
+    }
     const rook_x_position = desiredPosition.x === 6 ? 7 : 0;
     const rook_end_x_position = desiredPosition.x === 6 ? 5 : 3;
     //we just need to know that the king has moved.
@@ -196,7 +228,7 @@ export function updateBoard(
     return;
   }
   //regular move
-  const move = generateAnnotation(currentPiece, desiredPosition, pieces);
+  const move = generateAnnotation(currentPiece, desiredPosition, pieces, false);
   if (!isUndo) {
     if (move) {
       const newMove = {
