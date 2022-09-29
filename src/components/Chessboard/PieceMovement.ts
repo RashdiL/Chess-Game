@@ -1,10 +1,12 @@
-import { GRID_SIZE } from "../../Constants";
-
 export function grabPiece(e: React.MouseEvent, chessboard: HTMLDivElement) {
+  const GRID_SIZE = chessboard.offsetWidth / 8;
   const element = e.target as HTMLElement;
   const grabX = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
+
   const grabY = Math.abs(
-    Math.ceil((e.clientY - chessboard.offsetTop - 800) / GRID_SIZE)
+    Math.ceil(
+      (e.clientY - chessboard.offsetTop - chessboard.offsetWidth) / GRID_SIZE
+    )
   );
 
   const x = e.clientX - GRID_SIZE / 2;
@@ -20,12 +22,15 @@ export function movePiece(
   chessboard: HTMLDivElement,
   activePiece: HTMLElement
 ) {
-  const minX = chessboard.offsetLeft - 25;
-  const minY = chessboard.offsetTop - 25;
-  const maxX = chessboard.offsetLeft + chessboard.clientWidth - 75;
-  const maxY = chessboard.offsetTop + chessboard.clientHeight - 75;
-  const x = e.clientX - 50;
-  const y = e.clientY - 50;
+  const GRID_SIZE = chessboard.offsetWidth / 8;
+  const minX = chessboard.offsetLeft - GRID_SIZE / 4;
+  const minY = chessboard.offsetTop - GRID_SIZE / 4;
+  const maxX =
+    chessboard.offsetLeft + chessboard.offsetWidth - (GRID_SIZE / 4) * 3;
+  const maxY =
+    chessboard.offsetTop + chessboard.offsetHeight - (GRID_SIZE / 4) * 3;
+  const x = e.clientX - GRID_SIZE / 2;
+  const y = e.clientY - GRID_SIZE / 2;
   activePiece.style.position = "absolute";
 
   //If x is smaller than minimum amount
