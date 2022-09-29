@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "./Chessboard.css";
 import {
-  GRID_SIZE,
   Piece,
   PieceType,
   TeamType,
@@ -85,12 +84,16 @@ const Chessboard: React.FC<Props> = ({
     const element = e.target as HTMLElement;
     const chessboard = chessboardRef.current;
     if (!element.classList.contains("chess-piece") || !chessboard) return;
+    const GRID_SIZE = chessboard.offsetWidth / 8;
     if (e.type === "mousedown") {
       grabPiece(e, chessboard);
       setActivePiece(element);
       const grabX = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
       const grabY = Math.abs(
-        Math.ceil((e.clientY - chessboard.offsetTop - 800) / GRID_SIZE)
+        Math.ceil(
+          (e.clientY - chessboard.offsetTop - chessboard.offsetWidth) /
+            GRID_SIZE
+        )
       );
       setGrabPosition({ x: grabX, y: grabY });
     }
@@ -101,7 +104,10 @@ const Chessboard: React.FC<Props> = ({
       const referee = new Referee();
       const x = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
       const y = Math.abs(
-        Math.ceil((e.clientY - chessboard.offsetTop - 800) / GRID_SIZE)
+        Math.ceil(
+          (e.clientY - chessboard.offsetTop - chessboard.offsetWidth) /
+            GRID_SIZE
+        )
       );
       const desiredPosition: Position = { x: x, y: y };
       const validMove: boolean[] = referee.isValidMove(
