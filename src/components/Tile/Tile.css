@@ -1,16 +1,16 @@
 .tile {
   display: grid;
   place-content: center;
-  width: 100px;
-  height: 100px;
+  width: 6.25vw;
+  height: 6.25vw;
 }
 
 .tile .chess-piece {
-  width: 100px;
-  height: 100px;
+  width: 6.25vw;
+  height: 6.25vw;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 80px;
+  background-size: 5vw;
 }
 
 .tile .chess-piece:hover {
@@ -30,5 +30,5 @@
 }
 
 .tile img {
-  width: 80px;
+  width: 6.25vw;
 }
