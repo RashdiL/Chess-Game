@@ -238,7 +238,6 @@ export function updateBoard(
       };
       setMoveHistory([...moveHistory, newMove]);
     }
-    let promotionRow = currentPiece.team === TeamType.WHITE ? 7 : 0;
     adjustPieceMoveHistory(castlingPieceMoveHistory, currentPiece);
     const opposite_team =
       currentPiece.team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
@@ -260,17 +259,11 @@ export function updateBoard(
   }
   const updatedPieces = pieces.reduce((results, piece) => {
     if (samePosition(piece.position, grabPosition)) {
-      /*
       if (piece.type === PieceType.PAWN) {
-        if (desiredPosition.y === promotionRow) {
-          modalRef.current?.classList.remove("hidden");
-          setPromotionPawn(piece);
-        } else if (Math.abs(desiredPosition.y - grabPosition.y) === 2) {
+        if (Math.abs(desiredPosition.y - grabPosition.y) === 2) {
           piece.enPassant = true;
         }
       }
-      */
-      //error above for promoting
       piece.position = desiredPosition;
       results.push(piece);
     } else if (!samePosition(piece.position, desiredPosition)) {
