@@ -12,25 +12,25 @@ export default function Trainer() {
     <>
       <h1 className="title">Chess Opening Trainer</h1>
       <div className="parent">
-        <div className="child-1">
-          <div className="chessboard">
-            <Chessboard
-              moveHistory={moveHistory}
-              setMoveHistory={setMoveHistory}
-              undoMove={undoMove}
-              resetBoard={resetBoard}
-              setResetBoard={setResetBoard}
-            />
-          </div>
+        <div className="child chessboard">
+          <Chessboard
+            moveHistory={moveHistory}
+            setMoveHistory={setMoveHistory}
+            undoMove={undoMove}
+            resetBoard={resetBoard}
+            setResetBoard={setResetBoard}
+          />
         </div>
-        <div className="child-2">
+        <div className="child history">
           <MoveTracker moveHistory={moveHistory} />
         </div>
-        <OpeningTester
-          moveHistory={moveHistory}
-          setMoveHistory={setMoveHistory}
-          setResetBoard={setResetBoard}
-        />
+        <div className="child tester">
+          <OpeningTester
+            moveHistory={moveHistory}
+            setMoveHistory={setMoveHistory}
+            setResetBoard={setResetBoard}
+          />
+        </div>
       </div>
     </>
   );

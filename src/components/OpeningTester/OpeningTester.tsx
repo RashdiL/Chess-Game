@@ -53,14 +53,17 @@ const OpeningTester: React.FC<Props> = ({
     console.log(testingOpening);
   }
   return (
-    <div className="button">
-      <button
-        onClick={() => {
-          saveOpening();
-        }}
-      >
-        Click here to save your moves.
-      </button>
+    <>
+      <div className="button-container">
+        <button
+          className="button"
+          onClick={() => {
+            saveOpening();
+          }}
+        >
+          Click here to save your moves.
+        </button>
+      </div>
       <div className="moveResult">
         <h1 className="wrongMove" ref={isMoveWrong}>
           WRONG
@@ -69,7 +72,7 @@ const OpeningTester: React.FC<Props> = ({
           RIGHT
         </h1>
       </div>
-    </div>
+    </>
   );
 };
 export default OpeningTester;

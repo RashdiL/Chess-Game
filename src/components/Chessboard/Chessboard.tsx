@@ -248,29 +248,25 @@ const Chessboard: React.FC<Props> = ({
       <div id="checkmate" ref={gameStatus}>
         <h1>GAME OVER</h1>
       </div>
-      <div className="boardAndButton">
-        <div className="chessboard-container">
-          <div
-            onMouseMove={(e) => handlePieceMovement(e)}
-            onMouseDown={(e) => handlePieceMovement(e)}
-            onMouseUp={(e) => handlePieceMovement(e)}
-            id="chessboard"
-            ref={chessboardRef}
-          >
-            {board}
-          </div>
-        </div>
-        <div className="button-container">
-          <p>Click to undo button</p>
-          <button
-            onClick={() => {
-              handleUndo();
-            }}
-          >
-            Click here
-          </button>
+      <div className="chessboard-container">
+        <div
+          onMouseMove={(e) => handlePieceMovement(e)}
+          onMouseDown={(e) => handlePieceMovement(e)}
+          onMouseUp={(e) => handlePieceMovement(e)}
+          id="chessboard"
+          ref={chessboardRef}
+        >
+          {board}
         </div>
       </div>
+      <button
+        className="button"
+        onClick={() => {
+          handleUndo();
+        }}
+      >
+        Undo Move
+      </button>
     </>
   );
 };

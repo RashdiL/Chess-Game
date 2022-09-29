@@ -1,6 +1,5 @@
 import {
   castlingPieceMoveHistory,
-  GRID_SIZE,
   HORIZONTAL_AXIS,
   moveHistory,
   Piece,

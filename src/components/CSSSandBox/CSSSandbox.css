@@ -1,0 +1,48 @@
+body {
+  margin: 1.72vw;
+  font-family: "Abel";
+  text-align: center;
+  width: 100vw;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 10vw 10vw 10vw;
+  grid-template-rows: 10vw 10vw 10vw;
+  grid-gap: 1vw;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.a {
+  background: #0d9;
+}
+
+.b {
+  background: #d90;
+}
+
+.c {
+  background: #9d0;
+}
+
+.d {
+  background: #90d;
+}
+
+.e {
+  background: #d09;
+}
+
+.f {
+  background: #09d;
+}
+
+.c {
+  grid-row: 1 / 3;
+  grid-column: 1 /3;
+}
