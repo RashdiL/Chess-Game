@@ -20,17 +20,17 @@ import { updateBoard } from "./UtilityFunctions";
 type Props = {
   moveHistory: moveHistory[];
   setMoveHistory: React.Dispatch<React.SetStateAction<moveHistory[]>>;
-  undoMove: boolean;
   resetBoard: boolean;
   setResetBoard: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const Chessboard: React.FC<Props> = ({
   moveHistory,
   setMoveHistory,
-  undoMove,
   resetBoard,
   setResetBoard,
 }) => {
+  const [newMove, setNewMove] = useState<boolean>(false);
+  const [previousMove, setPreviousMove] = useState<boolean>(false);
   const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
   const [promotionPawn, setPromotionPawn] = useState<Piece>();
   const [grabPosition, setGrabPosition] = useState<Position>({ x: -1, y: -1 });
@@ -44,8 +44,11 @@ const Chessboard: React.FC<Props> = ({
     );
   const chessboardRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-  const gameStatus = useRef<HTMLDivElement>(null);
   const [deadPieces, setDeadPieces] = useState<Piece[] | null>(null);
+  const [gameStateHistory, setGameStateHistory] = useState<Piece[][]>([
+    JSON.parse(JSON.stringify(initialBoardState)),
+  ]);
+  const [moveCount, setMoveCount] = useState<number>(0);
   function createBoard(initialBoardState: Piece[]) {
     let board: JSX.Element[] = [];
     for (let j = VERTICAL_AXIS.length - 1; j >= 0; j--) {
@@ -74,10 +77,21 @@ const Chessboard: React.FC<Props> = ({
       setTurn(TeamType.WHITE);
     }
   }, [resetBoard, setResetBoard]);
-
   useEffect(() => {
-    setBoard(createBoard(pieces));
-    gameStatus.current?.classList.add("hidden");
+    if (newMove) {
+      setBoard(createBoard(pieces));
+      let newMoveCount = moveCount + 1;
+      setMoveCount(newMoveCount);
+      let newGameStateForHistory = JSON.parse(JSON.stringify(gameStateHistory));
+      let currentPieceState = JSON.parse(JSON.stringify(pieces));
+      newGameStateForHistory.push(currentPieceState);
+      setGameStateHistory(newGameStateForHistory);
+      setNewMove(false);
+      console.log(`Playing move ${newMoveCount}`);
+    } else if (previousMove) {
+      setBoard(createBoard(pieces));
+      setPreviousMove(false);
+    }
   }, [pieces]);
 
   function handlePieceMovement(e: React.MouseEvent) {
@@ -135,6 +149,7 @@ const Chessboard: React.FC<Props> = ({
           modalRef,
           false
         );
+        setNewMove(true);
         if (turn === TeamType.WHITE) {
           setTurn(TeamType.BLACK);
         } else {
@@ -194,25 +209,20 @@ const Chessboard: React.FC<Props> = ({
   }
 
   function handleUndo() {
+    if (!gameStateHistory) return;
+    setPreviousMove(true);
     const newMoveHistory = JSON.parse(JSON.stringify(moveHistory));
     const lastMove = newMoveHistory.pop();
     setMoveHistory(newMoveHistory);
-    if (!lastMove) return;
-    updateBoard(
-      [true, false, false],
-      lastMove.prevPosition,
-      castlingPieceMoveHistory,
-      pieces,
-      lastMove.newPosition,
-      setPieces,
-      moveHistory,
-      setMoveHistory,
-      deadPieces,
-      setDeadPieces,
-      setPromotionPawn,
-      modalRef,
-      true
-    );
+
+    const previousMoveCount = moveCount - 1;
+    console.log(`returning to move ${previousMoveCount}`);
+    setMoveCount(previousMoveCount);
+    let previousGameState = gameStateHistory.at(previousMoveCount);
+    console.log(previousGameState);
+    if (previousGameState) {
+      setPieces(previousGameState);
+    }
     if (turn === TeamType.WHITE) {
       setTurn(TeamType.BLACK);
     } else {
@@ -244,9 +254,6 @@ const Chessboard: React.FC<Props> = ({
             alt="queen"
           />
         </div>
-      </div>
-      <div id="checkmate" ref={gameStatus}>
-        <h1>GAME OVER</h1>
       </div>
       <div className="chessboard-container">
         <div

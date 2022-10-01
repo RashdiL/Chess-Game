@@ -6,7 +6,6 @@ import { moveHistory } from "../../Constants";
 import OpeningTester from "../OpeningTester/OpeningTester";
 export default function Trainer() {
   const [moveHistory, setMoveHistory] = useState<moveHistory[]>([]);
-  const [undoMove, setUndoMove] = useState<boolean>(false);
   const [resetBoard, setResetBoard] = useState<boolean>(false);
   return (
     <>
@@ -16,7 +15,6 @@ export default function Trainer() {
           <Chessboard
             moveHistory={moveHistory}
             setMoveHistory={setMoveHistory}
-            undoMove={undoMove}
             resetBoard={resetBoard}
             setResetBoard={setResetBoard}
           />
