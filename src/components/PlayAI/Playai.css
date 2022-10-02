@@ -1,0 +1,20 @@
+body {
+  margin: 1.72vw;
+  font-family: "Abel";
+  text-align: center;
+  width: 100vw;
+}
+
+.parent {
+  margin-left: 25vw;
+  display: grid;
+  grid-template-columns: 32vw 32vw 32vw;
+  grid-template-rows: 16vw 16vw 16vw;
+  grid-gap: 1vw;
+}
+
+.chessboard {
+  background-color: pink;
+  grid-row: 1 / 3;
+  grid-column: 1 / 2;
+}

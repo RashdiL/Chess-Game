@@ -10,6 +10,10 @@ export enum PieceType {
   QUEEN,
   KING,
 }
+export interface PieceValue {
+  pieceType: PieceType;
+  value: number;
+}
 export function samePosition(p1: Position, p2: Position) {
   return p1.x === p2.x && p1.y === p2.y;
 }

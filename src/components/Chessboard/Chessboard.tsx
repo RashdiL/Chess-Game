@@ -17,6 +17,7 @@ import { grabPiece, movePiece } from "./PieceMovement";
 import Tile from "../Tile/Tile";
 import Referee from "../../referee/Referee";
 import { updateBoard } from "./UtilityFunctions";
+import CalculateEvaluation, { generateMove } from "../Movegenerator/Evaluation";
 type Props = {
   moveHistory: moveHistory[];
   setMoveHistory: React.Dispatch<React.SetStateAction<moveHistory[]>>;
@@ -80,6 +81,8 @@ const Chessboard: React.FC<Props> = ({
   useEffect(() => {
     if (newMove) {
       setBoard(createBoard(pieces));
+      let piecesClone = JSON.parse(JSON.stringify(pieces));
+      generateMove(piecesClone, castlingPieceMoveHistory);
       let newMoveCount = moveCount + 1;
       setMoveCount(newMoveCount);
       let newGameStateForHistory = JSON.parse(JSON.stringify(gameStateHistory));
@@ -87,7 +90,8 @@ const Chessboard: React.FC<Props> = ({
       newGameStateForHistory.push(currentPieceState);
       setGameStateHistory(newGameStateForHistory);
       setNewMove(false);
-      console.log(`Playing move ${newMoveCount}`);
+      let evaluation = CalculateEvaluation(pieces);
+      console.log(`Evaluation is at ${evaluation}`);
     } else if (previousMove) {
       setBoard(createBoard(pieces));
       setPreviousMove(false);
