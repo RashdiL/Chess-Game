@@ -228,40 +228,44 @@ export function updateBoard(
   }
   //regular move
   const move = generateAnnotation(currentPiece, desiredPosition, pieces, false);
-  if (!isUndo) {
-    if (move) {
-      const newMove = {
-        piece: currentPiece,
-        prevPosition: currentPiece.position,
-        newPosition: desiredPosition,
-        newAnnotatedPosition: move,
-      };
-      setMoveHistory([...moveHistory, newMove]);
+  if (move) {
+    const newMove = {
+      piece: currentPiece,
+      prevPosition: currentPiece.position,
+      newPosition: desiredPosition,
+      newAnnotatedPosition: move,
+    };
+    setMoveHistory([...moveHistory, newMove]);
+  }
+  let promotionRow = currentPiece.team === TeamType.WHITE ? 7 : 0;
+  adjustPieceMoveHistory(castlingPieceMoveHistory, currentPiece);
+  const opposite_team =
+    currentPiece.team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
+  //Lets see if an enemy piece exists in the position we want to move to.
+  const enemy_piece = findPieceInSpecificPosition(
+    pieces,
+    desiredPosition,
+    opposite_team
+  );
+  if (enemy_piece) {
+    let newEnemyPieces: Piece[] | null = [];
+    if (deadPieces) {
+      newEnemyPieces = [...deadPieces, enemy_piece];
+    } else {
+      newEnemyPieces = [enemy_piece];
     }
-    adjustPieceMoveHistory(castlingPieceMoveHistory, currentPiece);
-    const opposite_team =
-      currentPiece.team === TeamType.WHITE ? TeamType.BLACK : TeamType.WHITE;
-    //Lets see if an enemy piece exists in the position we want to move to.
-    const enemy_piece = findPieceInSpecificPosition(
-      pieces,
-      desiredPosition,
-      opposite_team
-    );
-    if (enemy_piece) {
-      let newEnemyPieces: Piece[] | null = [];
-      if (deadPieces) {
-        newEnemyPieces = [...deadPieces, enemy_piece];
-      } else {
-        newEnemyPieces = [enemy_piece];
-      }
-      setDeadPieces(newEnemyPieces);
-    }
+    setDeadPieces(newEnemyPieces);
   }
   const updatedPieces = pieces.reduce((results, piece) => {
     if (samePosition(piece.position, grabPosition)) {
       if (piece.type === PieceType.PAWN) {
-        if (Math.abs(desiredPosition.y - grabPosition.y) === 2) {
-          piece.enPassant = true;
+        if (piece.type === PieceType.PAWN) {
+          if (desiredPosition.y === promotionRow) {
+            modalRef.current?.classList.remove("hidden");
+            setPromotionPawn(piece);
+          } else if (Math.abs(desiredPosition.y - grabPosition.y) === 2) {
+            piece.enPassant = true;
+          }
         }
       }
       piece.position = desiredPosition;

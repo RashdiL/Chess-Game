@@ -169,7 +169,7 @@ const Chessboard: React.FC<Props> = ({
     if (promotionPawn === undefined) {
       return;
     }
-
+    setNewMove(true);
     const updatedPieces = pieces.reduce((results, piece) => {
       if (samePosition(piece.position, promotionPawn.position)) {
         piece.type = pieceType;
@@ -194,13 +194,14 @@ const Chessboard: React.FC<Props> = ({
           }
         }
         piece.image = `assets/images/${image}_${teamType}.png`;
+        console.log(piece.image);
       }
       results.push(piece);
       return results;
     }, [] as Piece[]);
 
     setPieces(updatedPieces);
-
+    console.log("pieces set");
     modalRef.current?.classList.add("hidden");
   }
 
