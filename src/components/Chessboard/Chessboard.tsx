@@ -17,18 +17,20 @@ import { grabPiece, movePiece } from "./PieceMovement";
 import Tile from "../Tile/Tile";
 import Referee from "../../referee/Referee";
 import { updateBoard } from "./UtilityFunctions";
-import CalculateEvaluation, { generateMove } from "../Movegenerator/Evaluation";
+import { generateMove } from "../Movegenerator/Evaluation";
 type Props = {
   moveHistory: moveHistory[];
   setMoveHistory: React.Dispatch<React.SetStateAction<moveHistory[]>>;
   resetBoard: boolean;
   setResetBoard: React.Dispatch<React.SetStateAction<boolean>>;
+  playingAI: boolean;
 };
 const Chessboard: React.FC<Props> = ({
   moveHistory,
   setMoveHistory,
   resetBoard,
   setResetBoard,
+  playingAI,
 }) => {
   const [newMove, setNewMove] = useState<boolean>(false);
   const [previousMove, setPreviousMove] = useState<boolean>(false);
@@ -81,8 +83,6 @@ const Chessboard: React.FC<Props> = ({
   useEffect(() => {
     if (newMove) {
       setBoard(createBoard(pieces));
-      let piecesClone = JSON.parse(JSON.stringify(pieces));
-      generateMove(piecesClone, castlingPieceMoveHistory);
       let newMoveCount = moveCount + 1;
       setMoveCount(newMoveCount);
       let newGameStateForHistory = JSON.parse(JSON.stringify(gameStateHistory));
@@ -90,14 +90,39 @@ const Chessboard: React.FC<Props> = ({
       newGameStateForHistory.push(currentPieceState);
       setGameStateHistory(newGameStateForHistory);
       setNewMove(false);
-      let evaluation = CalculateEvaluation(pieces);
-      console.log(`Evaluation is at ${evaluation}`);
+      if (turn === TeamType.WHITE) {
+        setTurn(TeamType.BLACK);
+      } else {
+        setTurn(TeamType.WHITE);
+      }
     } else if (previousMove) {
       setBoard(createBoard(pieces));
       setPreviousMove(false);
     }
   }, [pieces]);
-
+  useEffect(() => {
+    if (turn === TeamType.BLACK) {
+      let piecesClone = JSON.parse(JSON.stringify(pieces));
+      let aiMove = generateMove(piecesClone, castlingPieceMoveHistory);
+      if (!aiMove) return;
+      updateBoard(
+        [true, false, false],
+        aiMove[0].potentialPosition,
+        castlingPieceMoveHistory,
+        pieces,
+        aiMove[0].piece.position,
+        setPieces,
+        moveHistory,
+        setMoveHistory,
+        deadPieces,
+        setDeadPieces,
+        setPromotionPawn,
+        modalRef,
+        false
+      );
+      setNewMove(true);
+    }
+  }, [turn]);
   function handlePieceMovement(e: React.MouseEvent) {
     const element = e.target as HTMLElement;
     const chessboard = chessboardRef.current;
@@ -154,11 +179,6 @@ const Chessboard: React.FC<Props> = ({
           false
         );
         setNewMove(true);
-        if (turn === TeamType.WHITE) {
-          setTurn(TeamType.BLACK);
-        } else {
-          setTurn(TeamType.WHITE);
-        }
       } else {
         if (!activePiece) return;
         activePiece.style.position = "relative";

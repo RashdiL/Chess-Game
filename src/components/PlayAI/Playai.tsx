@@ -15,6 +15,7 @@ export default function Playai() {
             setMoveHistory={setMoveHistory}
             resetBoard={resetBoard}
             setResetBoard={setResetBoard}
+            playingAI={true}
           />
         </div>
       </div>

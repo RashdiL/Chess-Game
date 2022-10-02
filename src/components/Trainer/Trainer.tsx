@@ -17,6 +17,7 @@ export default function Trainer() {
             setMoveHistory={setMoveHistory}
             resetBoard={resetBoard}
             setResetBoard={setResetBoard}
+            playingAI={false}
           />
         </div>
         <div className="child history">

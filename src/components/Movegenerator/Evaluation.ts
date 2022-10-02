@@ -1,11 +1,18 @@
+import { basename } from "path";
 import {
   castlingPieceMoveHistory,
   Piece,
   PieceType,
+  Position,
   samePosition,
   TeamType,
 } from "../../Constants";
 import Referee from "../../referee/Referee";
+interface pieceAndMove {
+  piece: Piece;
+  eval: number;
+  potentialPosition: Position;
+}
 export default function CalculateEvaluation(pieces: Piece[]) {
   let pieceValues = {
     pawn: 1,
@@ -56,15 +63,17 @@ export function generateMove(
 ) {
   const referee = new Referee();
   const computerTeam = TeamType.BLACK;
+  let movesAndEvals: pieceAndMove[] = [];
   pieces.forEach((p) => {
     if (p.team === TeamType.BLACK) {
-      console.log(
-        `checking ${p.type} in position ${p.position.x} and ${p.position.y}`
-      );
-      console.log(`piece can move to`);
-      console.log(p.tilesControlled);
-      console.log("-----------------------------------");
-      p.tilesControlled.forEach((desiredPosition) => {
+      let checkingTiles: Position[] =
+        p.type === PieceType.PAWN
+          ? [
+              { x: p.position.x, y: p.position.y - 1 },
+              { x: p.position.x, y: p.position.y - 2 },
+            ].concat(p.tilesControlled)
+          : p.tilesControlled;
+      checkingTiles.forEach((desiredPosition) => {
         const currentPosition = p.position;
         const validMove: boolean[] = referee.isValidMove(
           desiredPosition,
@@ -75,7 +84,8 @@ export function generateMove(
         );
         if (validMove[0]) {
           const promotionRow = 0;
-          const updatedPieces = pieces.reduce((results, piece) => {
+          let piecesCopy: Piece[] = JSON.parse(JSON.stringify(pieces));
+          let updatedPieces = piecesCopy.reduce((results, piece) => {
             if (samePosition(piece.position, currentPosition)) {
               if (piece.type === PieceType.PAWN) {
                 if (desiredPosition.y === promotionRow) {
@@ -96,10 +106,23 @@ export function generateMove(
             }
             return results;
           }, [] as Piece[]);
-          console.log(CalculateEvaluation(updatedPieces));
+          movesAndEvals.push({
+            piece: p,
+            eval: CalculateEvaluation(updatedPieces),
+            potentialPosition: desiredPosition,
+          });
         }
       });
     }
   });
-  return;
+  let min = 10 ** 6;
+  let bestMove: pieceAndMove[] = [];
+  movesAndEvals.forEach((move) => {
+    if (move.eval < min) {
+      bestMove = [move];
+      min = move.eval;
+    }
+  });
+  console.log(bestMove);
+  return bestMove;
 }
