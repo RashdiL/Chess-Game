@@ -17,7 +17,12 @@ import { grabPiece, movePiece } from "./PieceMovement";
 import Tile from "../Tile/Tile";
 import Referee from "../../referee/Referee";
 import { updateBoard } from "./UtilityFunctions";
-import { generateMove } from "../Movegenerator/Evaluation";
+import {
+  generateMove,
+  generatePossibleMoves,
+  getBestMove,
+} from "../Movegenerator/Evaluation";
+import { deepEqual } from "assert";
 type Props = {
   moveHistory: moveHistory[];
   setMoveHistory: React.Dispatch<React.SetStateAction<moveHistory[]>>;
@@ -103,23 +108,8 @@ const Chessboard: React.FC<Props> = ({
   useEffect(() => {
     if (turn === TeamType.BLACK) {
       let piecesClone = JSON.parse(JSON.stringify(pieces));
-      let aiMove = generateMove(piecesClone, castlingPieceMoveHistory);
-      if (!aiMove) return;
-      updateBoard(
-        [true, false, false],
-        aiMove[0].potentialPosition,
-        castlingPieceMoveHistory,
-        pieces,
-        aiMove[0].piece.position,
-        setPieces,
-        moveHistory,
-        setMoveHistory,
-        deadPieces,
-        setDeadPieces,
-        setPromotionPawn,
-        modalRef,
-        false
-      );
+      let newBoard = getBestMove(2, piecesClone, true).bestMove;
+      setPieces(newBoard);
       setNewMove(true);
     }
   }, [turn]);
