@@ -206,109 +206,81 @@ export function generatePossibleMoves(pieces: Piece[], team: TeamType) {
   });
   return validMoves;
 }
-/*
-export var getBestMove = function (
+
+export function getBestMove(
   depth: number,
   pieces: Piece[],
-  isAI: boolean = true
+  isAI: boolean,
+  alpha: number = 10 ** 4,
+  beta: number = (-10) ** 4
 ) {
+  let team = isAI === true ? TeamType.BLACK : TeamType.WHITE;
   if (depth === 0) {
-    let evalBar = CalculateEvaluation(pieces);
     return {
-      move: {
-        piece: {
-          image: `assets/images/bishop_b.png`,
-          position: {
-            x: 2,
-            y: 7,
-          },
-          type: PieceType.BISHOP,
-          team: TeamType.BLACK,
-          tilesControlled: [
-            { x: 1, y: 6 },
-            { x: 3, y: 6 },
-          ],
-        },
-        potentialPosition: { x: 1, y: 6 },
-      },
-      eval: evalBar,
+      bestEval: oneDepthBestMove(pieces, team).bestEval,
+      bestMove: oneDepthBestMove(pieces, team).bestMove,
     };
   }
-  let evaluatingTeam = isAI ? TeamType.BLACK : TeamType.WHITE;
-  let possibleMoves = generatePossibleMoves(pieces, evaluatingTeam);
-  let piecesCopy = JSON.parse(JSON.stringify(pieces));
 
+  let possibleMoves = generatePossibleMoves(pieces, team);
   if (isAI) {
     let minimumEval = 1 * 10 ** 6;
-    let bestMinMove = [
-      {
-        image: `assets/images/bishop_b.png`,
-        position: {
-          x: 2,
-          y: 7,
-        },
-        type: PieceType.BISHOP,
-        team: TeamType.BLACK,
-        tilesControlled: [
-          { x: 1, y: 6 },
-          { x: 3, y: 6 },
-        ],
-      },
-      { x: 1, y: 6 },
-    ];
+    let bestMinMove: Piece[] = possibleMoves[0].board;
     for (let i = 0; i < possibleMoves.length; i++) {
-      let candidateMinMove = possibleMoves[i];
-      let minEvaluation = getBestMove(depth - 1, piecesCopy, false).eval;
-      if (minEvaluation < minimumEval) {
-        minimumEval = minEvaluation;
-        bestMinMove = [
-          candidateMinMove.piece,
-          candidateMinMove.desiredPosition,
-        ];
+      let candidateMoveOriginal = possibleMoves[i];
+      let candidateMinMove = JSON.parse(JSON.stringify(candidateMoveOriginal));
+      let board: Piece[] = candidateMinMove.board;
+      let minimizerCurrentEvaluation: number = getBestMove(
+        depth - 1,
+        board,
+        false
+      ).bestEval;
+      if (minimizerCurrentEvaluation < minimumEval) {
+        minimumEval = minimizerCurrentEvaluation;
+        bestMinMove = board;
+      }
+      if (minimizerCurrentEvaluation < alpha) {
+        alpha = minimizerCurrentEvaluation;
       }
     }
     return {
-      move: { piece: bestMinMove[0], potentialPosition: bestMinMove[1] },
-      eval: minimumEval,
+      bestEval: minimumEval,
+      bestMove: bestMinMove,
     };
   } else {
     let maximumEval = -1 * 10 ** 6;
-    let bestMaxMove = [
-      {
-        image: `assets/images/knight_w.png`,
-        position: {
-          x: 6,
-          y: 0,
-        },
-        type: PieceType.KNIGHT,
-        team: TeamType.WHITE,
-        tilesControlled: [
-          { x: 7, y: 2 },
-          { x: 5, y: 2 },
-          { x: 4, y: 1 },
-        ],
-      },
-      { x: 1, y: 6 },
-    ];
+    let bestMaxMove: Piece[] = possibleMoves[0].board;
     for (let i = 0; i < possibleMoves.length; i++) {
-      let candidateMaxMove = possibleMoves[i];
-      let maxEvaluation = getBestMove(depth - 1, piecesCopy, true).eval;
-      if (maxEvaluation > maximumEval) {
-        maximumEval = maxEvaluation;
-        bestMaxMove = [
-          candidateMaxMove.piece,
-          candidateMaxMove.desiredPosition,
-        ];
+      let candidateMaxMoveOriginal = possibleMoves[i];
+      let candidateMaxMove = JSON.parse(
+        JSON.stringify(candidateMaxMoveOriginal)
+      );
+      let MaxBoard: Piece[] = candidateMaxMove.board;
+      console.log(`next depth: ${depth - 1}, board: ${MaxBoard}`);
+      let maximizerCurrentEvaluation = getBestMove(
+        depth - 1,
+        MaxBoard,
+        true
+      ).bestEval;
+      if (maximizerCurrentEvaluation > maximumEval) {
+        maximumEval = maximizerCurrentEvaluation;
+        bestMaxMove = MaxBoard;
+      }
+      if (maximizerCurrentEvaluation > beta) {
+        beta = maximizerCurrentEvaluation;
+      }
+
+      if (alpha <= beta) {
+        break;
       }
     }
     return {
-      move: { piece: bestMaxMove[0], potentialPosition: bestMaxMove[1] },
-      eval: maximumEval,
+      bestEval: maximumEval,
+      bestMove: bestMaxMove,
     };
   }
-};
-*/
-
+}
+/*
 export function getBestMove(depth: number, pieces: Piece[], isAI: boolean) {
   let team = isAI === true ? TeamType.BLACK : TeamType.WHITE;
   if (depth === 0) {
@@ -317,10 +289,7 @@ export function getBestMove(depth: number, pieces: Piece[], isAI: boolean) {
       bestMove: oneDepthBestMove(pieces, team).bestMove,
     };
   }
-  console.log(pieces);
-  console.log(team);
-  console.log(depth);
-  console.log(isAI);
+
   let possibleMoves = generatePossibleMoves(pieces, team);
   if (isAI) {
     let minimumEval = 1 * 10 ** 6;
@@ -361,7 +330,7 @@ export function getBestMove(depth: number, pieces: Piece[], isAI: boolean) {
     };
   }
 }
-
+*/
 //This function looks one move into the future and plays a move that does not hang a piece. Or it takes the piece with the best value.
 export function oneDepthBestMove(pieces: Piece[], team: TeamType) {
   const allMoves = generatePossibleMoves(pieces, team);
